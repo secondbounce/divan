@@ -4,8 +4,12 @@
 /dist
 /tmp
 /out-tsc
-# Only exists if Bazel was run
-/bazel-out
+## /app-builds
+/release
+## main.js
+## src/**/*.js
+app/**/*.js
+*.js.map
 
 # dependencies
 /node_modules
@@ -28,9 +32,9 @@ chrome-profiler-events*.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-.history/*
 
 # misc
+/.eslintcache
 /.sass-cache
 /connect.lock
 /coverage
@@ -39,6 +43,11 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+
+# e2e
+## /e2e/*.js
+## !/e2e/protractor.conf.js
+## /e2e/*.map
 
 # System Files
 .DS_Store

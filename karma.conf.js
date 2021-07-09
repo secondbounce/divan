@@ -7,9 +7,9 @@ module.exports = function (config) {
     frameworks: ['jasmine', '@angular-devkit/build-angular'],
     plugins: [
       require('karma-jasmine'),
-      require('karma-chrome-launcher'),
+      require('karma-electron'),
       require('karma-jasmine-html-reporter'),
-      require('karma-coverage'),
+      require('karma-coverage-istanbul-reporter'),
       require('@angular-devkit/build-angular/plugins/karma')
     ],
     client: {
@@ -24,21 +24,35 @@ module.exports = function (config) {
     jasmineHtmlReporter: {
       suppressAll: true // removes the duplicated traces
     },
-    coverageReporter: {
-      dir: require('path').join(__dirname, './coverage/divan'),
-      subdir: '.',
-      reporters: [
-        { type: 'html' },
-        { type: 'text-summary' }
-      ]
+    coverageIstanbulReporter: {
+      dir: require('path').join(__dirname, './coverage'),
+      reports: [ 'html', 'lcovonly' ],
+      fixWebpackSourcePaths: true
     },
     reporters: ['progress', 'kjhtml'],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
-    autoWatch: true,
-    browsers: ['Chrome'],
-    singleRun: false,
-    restartOnFileChange: true
+    //autoWatch: true,
+    browsers: ['Divan'],
+    //singleRun: false,
+    //restartOnFileChange: true
+    customLaunchers: {
+      Divan: {
+        base: 'Electron',
+        flags: [
+          '--remote-debugging-port=9222'
+        ],
+        browserWindowOptions: {
+          webPreferences: {
+            nodeIntegration: true,
+            nodeIntegrationInSubFrames: true,
+            allowRunningInsecureContent: true,
+            enableRemoteModule: true,
+            contextIsolation: false
+          }
+        }
+      }
+    }
   });
 };

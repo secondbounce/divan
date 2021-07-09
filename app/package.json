@@ -1,0 +1,12 @@
+{
+  "name": "divan",
+  "version": "0.0.0",
+  "description": "Database administration for CouchDB",
+  "author": {
+    "name": "David Geary",
+    "email": "david@secondbounce.com"
+  },
+  "main": "main.js",
+  "private": true,
+  "dependencies": {}
+}

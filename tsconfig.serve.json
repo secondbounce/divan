@@ -1,17 +1,13 @@
 {
-  "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "./dist/out-tsc",
-    "module": "es2020",
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "allowJs": true,
     "target": "es5",
-    "typeRoots": [
-      "node_modules/@types"
+    "types": [
+      "node"
     ],
     "lib": [
       "es2017",
@@ -20,10 +16,11 @@
       "dom"
     ]
   },
-  "include": [
-    "src/**/*.d.ts"
+  "files": [
+    "app/main.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "**/*.spec.ts"
   ]
 }

@@ -1,20 +1,39 @@
 {
   "name": "divan",
   "version": "0.0.0",
-  "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+  "description": "Database administration for CouchDB",
+  "author": {
+    "name": "David Geary",
+    "email": "david@secondbounce.com"
   },
+  "license": "MIT",
+  "main": "app/main.js",
   "private": true,
+  "scripts": {
+    "postinstall": "electron-builder install-app-deps",
+    "ng": "ng",
+    "start": "npm-run-all -p electron:serve-seems_to_rely_on_ng_serve_running_beforehand ng:serve",
+    "build": "npm run electron:serve-tsc && ng build --base-href ./",
+    "build:dev": "npm run build -- -c development",
+    "build:prod": "npm run build -- -c production",
+    "ng:serve": "ng serve -o",
+    "electron:serve-tsc": "tsc -p tsconfig.serve.json",
+    "electron:serve-seems_to_rely_on_ng_serve_running_beforehand": "wait-on tcp:4200 && npm run electron:serve-tsc && npx electron . --serve",
+    "electron:local": "npm run build:prod && npx electron .",
+    "electron:build": "npm run build:prod && electron-builder build --publish=never",
+    "test": "ng test",
+    "test:once": "ng test --watch=false",
+    "--e2e": "npm run build:prod && cross-env TS_NODE_PROJECT='e2e/tsconfig.e2e.json' mocha --timeout 300000 --require ts-node/register e2e/**/*.e2e.ts",
+    "--version": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",
+    "lint": "ng lint --cache"
+  },
   "dependencies": {
     "@angular/animations": "~12.1.0",
     "@angular/common": "~12.1.0",
     "@angular/compiler": "~12.1.0",
     "@angular/core": "~12.1.0",
     "@angular/forms": "~12.1.0",
+    "@angular/language-service": "~12.1.0",
     "@angular/platform-browser": "~12.1.0",
     "@angular/platform-browser-dynamic": "~12.1.0",
     "@angular/router": "~12.1.0",
@@ -24,16 +43,46 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~12.1.0",
+    "@angular-eslint/builder": "~12.2.0",
+    "@angular-eslint/eslint-plugin": "~12.2.0",
+    "@angular-eslint/eslint-plugin-template": "~12.2.0",
+    "@angular-eslint/schematics": "~12.2.0",
+    "@angular-eslint/template-parser": "~12.2.0",
     "@angular/cli": "~12.1.0",
     "@angular/compiler-cli": "~12.1.0",
     "@types/jasmine": "~3.6.0",
-    "@types/node": "^12.11.1",
-    "jasmine-core": "~3.7.0",
-    "karma": "~6.3.0",
-    "karma-chrome-launcher": "~3.1.0",
-    "karma-coverage": "~2.0.3",
-    "karma-jasmine": "~4.0.0",
-    "karma-jasmine-html-reporter": "^1.5.0",
-    "typescript": "~4.3.2"
-  }
+    "@types/jasminewd2": "~2.0.9",
+    "@types/mocha": "~8.2.2",
+    "@types/node": "^15.6.1",
+    "@typescript-eslint/eslint-plugin": "~4.25.0",
+    "@typescript-eslint/parser": "~4.25.0",
+    "chai": "~4.3.4",
+    "conventional-changelog-cli": "~2.1.1",
+    "cross-env": "~7.0.3",
+    "electron": "~13.0.1",
+    "electron-builder": "~22.10.5",
+    "electron-reload": "~1.5.0",
+    "eslint": "^7.27.0",
+    "jasmine-core": "~3.7.1",
+    "jasmine-spec-reporter": "7.0.0",
+    "karma": "~6.3.2",
+    "karma-coverage-istanbul-reporter": "~3.0.3",
+    "karma-electron": "~7.0.0",
+    "karma-jasmine": "~4.0.1",
+    "karma-jasmine-html-reporter": "^1.6.0",
+    "mocha": "~8.4.0",
+    "nan": "~2.14.2",
+    "npm-run-all": "~4.1.5",
+    "spectron": "~15.0.0",
+    "ts-node": "~9.1.1",
+    "typescript": "~4.3.2",
+    "wait-on": "~5.0.1",
+    "webdriver-manager": "~12.1.8"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "browserslist": [
+    "chrome 83"
+  ]
 }
