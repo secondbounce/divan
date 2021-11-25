@@ -1,29 +1,40 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "./dist/out-tsc",
-    "module": "es2020",
-    "sourceMap": true,
+    "allowJs": true,
     "declaration": false,
-    "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "allowJs": true,
-    "target": "es5",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
     "lib": [
       "es2017",
       "es2016",
       "es2015",
       "dom"
+    ],
+    "module": "es2020",
+    "moduleResolution": "node",
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "strict": true,
+    "target": "es5",
+    "typeRoots": [
+      "node_modules/@types"
     ]
   },
-  "include": [
-    "src/**/*.d.ts"
-  ],
+  "angularCompilerOptions": {
+    "annotateForClosureCompiler": true,
+    "disableTypeScriptVersionCheck": true,
+    "fullTemplateTypeCheck": true,
+    "preserveWhitespaces": true,
+    "skipMetadataEmit": false,
+    "skipTemplateCodegen": false,
+    "strictInjectionParameters": true,
+    "strictTemplates": true
+  },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "src/**/.unused/*.ts",
+    "src/**/*.unused.ts",
+    "**/*.unused"
   ]
 }

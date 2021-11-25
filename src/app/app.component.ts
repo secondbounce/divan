@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
-import { ElectronService } from './services';
 import { environment } from '../environments/environment';
+import { ElectronService } from './services';
 
 @Component({
   selector: 'app-root',

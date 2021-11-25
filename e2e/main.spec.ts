@@ -1,0 +1,62 @@
+import * as Path from 'path';
+import { expect, test } from '@playwright/test';
+import { BrowserContext, _electron as electron, ElectronApplication, Page } from 'playwright';
+
+test.describe('Check Home Page', () => {
+  let app: ElectronApplication;
+  let firstWindow: Page;
+  let context: BrowserContext;
+
+  test.beforeAll( async () => {
+    app = await electron.launch({ args: [Path.join(__dirname, '../app/main.js'), Path.join(__dirname, '../app/package.json')] });
+    context = app.context();
+    await context.tracing.start({ screenshots: true, snapshots: true });
+    firstWindow = await app.firstWindow();
+    await firstWindow.waitForLoadState('domcontentloaded');
+  });
+
+  test('Launch electron app', async () => {
+
+    const windowState: { isVisible: boolean; isDevToolsOpened: boolean; isCrashed: boolean } = await app.evaluate(async (process) => {
+      const mainWindow: Electron.BrowserWindow = process.BrowserWindow.getAllWindows()[0];
+
+      const getState: any = () => ({
+        isVisible: mainWindow.isVisible(),
+        isDevToolsOpened: mainWindow.webContents.isDevToolsOpened(),
+        isCrashed: mainWindow.webContents.isCrashed()
+      });
+
+      return new Promise((resolve) => {
+        if (mainWindow.isVisible()) {
+          resolve(getState());
+        } else {
+          mainWindow.once('ready-to-show', () => setTimeout(() => resolve(getState()), 0));
+        }
+      });
+    });
+
+    expect(windowState.isVisible).toBeTruthy();
+    expect(windowState.isDevToolsOpened).toBeFalsy();
+    expect(windowState.isCrashed).toBeFalsy();
+  });
+
+  // test('Check Home Page design', async ({ browserName}) => {
+  //   // Uncomment if you change the design of Home Page in order to create a new screenshot
+  //   const screenshot = await firstWindow.screenshot({ path: '/tmp/home.png' });
+  //   expect(screenshot).toMatchSnapshot(`home-${browserName}.png`);
+  // });
+
+  // test('Check title', async () => {
+  //   const elem: ElementHandle<SVGElement | HTMLElement> | null = await firstWindow.$('app-home h1');
+  //   expect(elem).not.toBeNull();
+  //   if (elem) {
+  //     const text: string = await elem.innerText();
+  //     expect(text).toBe('App works !');
+  //   }
+  // });
+
+  test.afterAll( async () => {
+    await context.tracing.stop({ path: 'e2e/tracing/trace.zip' });
+    await app.close();
+  });
+});
