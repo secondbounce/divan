@@ -33,7 +33,7 @@
     "lint": "ng lint --cache"
   },
   "dependencies": {
-    "@angular/common": "~13.0.2",
+    "@angular/common": "~13.0.3",
     "@angular/compiler": "~13.0.2",
     "@angular/core": "~13.0.2",
     "@angular/forms": "~13.0.3",
