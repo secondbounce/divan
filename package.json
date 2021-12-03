@@ -64,7 +64,7 @@
     "@typescript-eslint/eslint-plugin": "~5.5.0",
     "@typescript-eslint/parser": "~5.5.0",
     "conventional-changelog-cli": "~2.1.1",
-    "electron": "~16.0.3",
+    "electron": "~16.0.4",
     "electron-builder": "~22.13.1",
     "electron-reload": "~1.5.0",
     "eslint": "~8.3.0",
