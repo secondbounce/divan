@@ -60,7 +60,7 @@
     "@types/diff": "^5.0.1",
     "@types/jasmine": "~3.10.2",
     "@types/jasminewd2": "~2.0.10",
-    "@types/node": "~16.11.11",
+    "@types/node": "~16.11.12",
     "@typescript-eslint/eslint-plugin": "~5.5.0",
     "@typescript-eslint/parser": "~5.5.0",
     "conventional-changelog-cli": "~2.1.1",
