@@ -91,7 +91,8 @@ export class Application {
         label: 'File',
         submenu: [
           {
-            label: 'Open'
+            label: 'Open',
+            click: (): void => { this.sendMenuCommand(MenuCommand.OpenServer) }
           },
           { type: 'separator' },
           this.isMac ? { role: 'close' }

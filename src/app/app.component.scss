@@ -1,0 +1,17 @@
+:host {
+  display: grid;
+  grid-template-areas: "main-menu content";
+  grid-template-columns: 200px auto;
+  grid-template-rows: 1fr;
+  height: 100vh;
+}
+
+nav {
+  grid-area: main-menu;
+  overflow: auto;
+}
+
+main {
+  grid-area: content;
+  overflow: auto;
+}
