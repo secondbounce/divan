@@ -1,0 +1,34 @@
+<div class="background"></div>
+<form [formGroup]="this.formGroup" aria-label="Connect Server" (ngSubmit)="onSubmit()">
+	<div>
+		<label>Alias</label>
+		<input type="text" id="alias" formControlName="alias" autocomplete="off">
+	</div>
+	<div>
+		<label>Server address</label>
+		<input type="url" id="address" formControlName="address" inputmode="url" autocomplete="off" autofocus="true" required>
+	</div>
+	<p *ngIf="this.addressControl.invalid && (this.addressControl.dirty || this.addressControl.touched)" class="form-validation">
+		<ng-template [ngIf]="this.addressControl.errors?.required">Please enter the server address</ng-template>
+		<ng-template [ngIf]="this.addressControl.errors?.pattern">This isn't a valid server address</ng-template>
+	</p>
+	<div>
+		<label>Username</label>
+		<input type="text" id="username" formControlName="username" autocomplete="username" required>
+	</div>
+	<p *ngIf="this.usernameControl.invalid && (this.usernameControl.dirty || this.usernameControl.touched)" class="form-validation">
+		<ng-template [ngIf]="this.usernameControl.errors?.required">Please enter the username</ng-template>
+	</p>
+	<div>
+		<label>Password</label>
+		<input type="password" id="password" formControlName="password" autocomplete="current-password" required>
+	</div>
+	<p *ngIf="this.passwordControl.invalid && (this.passwordControl.dirty || this.passwordControl.touched)" class="form-validation">
+		<ng-template [ngIf]="this.passwordControl.errors?.required">Please enter the password</ng-template>
+	</p>
+
+	<footer>
+		<button type="submit">Open</button>
+		<button type="button" (click)="onClickCancel()">Cancel</button>
+	</footer>
+</form>

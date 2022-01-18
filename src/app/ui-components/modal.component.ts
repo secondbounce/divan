@@ -14,4 +14,12 @@ export interface ModalResult {
 export abstract class ModalComponent extends FormComponent {
   // @HostBinding('@state') public state: 'opened' | 'closed' = 'closed';
   @Output() public closed = new EventEmitter<ModalResult>();
+
+  protected ok(data?: any): void {
+    this.closed.next({ ok: true, data });
+  }
+
+  protected cancel(): void {
+    this.closed.next({ ok: false });
+  }
 }

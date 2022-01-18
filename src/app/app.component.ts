@@ -3,8 +3,9 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { environment } from '../environments/environment';
 import { Logger, LogService } from './core/logging';
 import { Channel, MenuCommand } from './enums';
+import { SelectServerComponent } from './servers';
 import { ElectronService, ModalService } from './services';
-import { ModalResult, PopupComponent } from './ui-components';
+import { ModalResult } from './ui-components';
 import { convertToText } from './utility';
 
 @Component({
@@ -32,7 +33,7 @@ export class AppComponent {
   private handleMenuCommand = (message: any): void => {
     switch (message) {
       case MenuCommand.OpenServer:
-        this._modalService.show<PopupComponent>(PopupComponent.elementTag)
+        this._modalService.show<SelectServerComponent>(SelectServerComponent.elementTag)
                           .subscribe({
                             next: (result: ModalResult) => {
                               console.log(result);

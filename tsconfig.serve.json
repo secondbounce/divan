@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "declaration": false,
+    "downlevelIteration": true,    // Required to avoid "Type 'IterableIterator<...>' is not an array type or a string type" for Map.values()
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "lib": [
