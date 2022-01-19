@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 
 import { environment } from '../environments/environment';
 import { Logger, LogService } from './core/logging';
+import { Server } from './core/model';
 import { Channel, MenuCommand } from './enums';
-import { SelectServerComponent } from './servers';
+import { SelectServerComponent, ServerListComponent } from './servers';
 import { ElectronService, ModalService } from './services';
 import { ModalResult } from './ui-components';
 import { convertToText } from './utility';
@@ -15,6 +16,7 @@ import { convertToText } from './utility';
   changeDetection: ChangeDetectionStrategy.Default
 })
 export class AppComponent {
+  @ViewChild(ServerListComponent) public serverList!: ServerListComponent;
   private readonly _log: Logger;
 
   constructor(private _modalService: ModalService,
@@ -36,7 +38,7 @@ export class AppComponent {
         this._modalService.show<SelectServerComponent>(SelectServerComponent.elementTag)
                           .subscribe({
                             next: (result: ModalResult) => {
-                              console.log(result);
+                              this.serverList.addServer(result.data as Server);
                             },
                             error: (error: any) => {
                               this._log.warn(error);

@@ -1,3 +1,5 @@
+@import 'variables';
+
 :host {
   display: grid;
   grid-template-areas: "main-menu content";
@@ -7,11 +9,14 @@
 }
 
 nav {
+  border-inline-end: solid 1px $border-color-default;
   grid-area: main-menu;
   overflow: auto;
+  padding: $padding-vertical $padding-horizontal;
 }
 
 main {
   grid-area: content;
   overflow: auto;
+  padding: $padding-vertical $padding-horizontal;
 }

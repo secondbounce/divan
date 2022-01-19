@@ -4,3 +4,9 @@ body {
   font-family: system-ui;
   font-size: 9pt;
 }
+
+details {
+  > :not(summary) {
+    margin-inline-start: 1em;
+  }
+}
