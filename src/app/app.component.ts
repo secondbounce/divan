@@ -35,15 +35,7 @@ export class AppComponent {
   private handleMenuCommand = (message: any): void => {
     switch (message) {
       case MenuCommand.OpenServer:
-        this._modalService.show<SelectServerComponent>(SelectServerComponent.elementTag)
-                          .subscribe({
-                            next: (result: ModalResult) => {
-                              this.serverList.addServer(result.data as Server);
-                            },
-                            error: (error: any) => {
-                              this._log.warn(error);
-                            }
-                          });
+        this.openServer();
         break;
 
       default:
@@ -51,4 +43,18 @@ export class AppComponent {
         break;
     }
   };
+
+  private openServer(): void {
+    this._modalService.show<SelectServerComponent>(SelectServerComponent.elementTag)
+                      .subscribe({
+                        next: (result: ModalResult) => {
+                          if (result.ok) {
+                            this.serverList.addServer(result.data as Server);
+                          }
+                        },
+                        error: (error: any) => {
+                          this._log.warn(error);
+                        }
+                      });
+  }
 }
