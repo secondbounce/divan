@@ -1,14 +1,19 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { BrowserWindow, BrowserWindowConstructorOptions, Menu, MenuItem, MenuItemConstructorOptions } from 'electron';
+import { BrowserWindow, BrowserWindowConstructorOptions, ipcMain, Menu, MenuItemConstructorOptions } from 'electron';
 // TODO: currently getting "Could not find a declaration file for module 'electron-reload'" even though it supposedly supports typings
 // import electronReload from 'electron-reload';
 
-import { Channel, MenuCommand } from '../src/app/enums';
+import { ServerCredentials } from '../src/app/core/model';
+import { Channel, MainCommand, MenuCommand } from '../src/app/enums';
+import { RecentlyOpenedService } from './services/recently-opened.service';
+
+const RECENTLY_OPENED_MENU_ID: string = 'recently-opened';
 
 export class Application {
   public readonly isMac: boolean;
   private _mainWindow: BrowserWindow | undefined;
+  private _recentlyOpenedService: RecentlyOpenedService = RecentlyOpenedService.instance;
 
   constructor(private _electronApp: Electron.App, private _debugMode: boolean) {
     this.isMac = process.platform === 'darwin';
@@ -19,6 +24,8 @@ export class Application {
 
   public initialize(): void {
     this.createMainWindow();
+
+    ipcMain.on(Channel.MainCommand, (_event, ...args) => this.handleMainProcessCommand(args));
   }
 
   private createMainWindow(): void {
@@ -37,7 +44,16 @@ export class Application {
 
     Menu.setApplicationMenu(null);
     const menu: Menu = this.createMainMenu();
-    mainWindow.setMenu(menu);
+    Menu.setApplicationMenu(menu);
+
+    this._recentlyOpenedService.recentlyOpenedServers$
+                               .subscribe(recentCredentials => {
+                                  /* There's currently no way to remove items from a menu so the
+                                    only practical option is to recreate the menu and reassign it.
+                                  */
+                                  const updateMenu: Menu = this.createMainMenu(recentCredentials);
+                                  Menu.setApplicationMenu(updateMenu);
+                                });
 
     mainWindow.webContents.setWindowOpenHandler(details => {
       const options: BrowserWindowConstructorOptions = JSON.parse(details.features);
@@ -85,14 +101,20 @@ export class Application {
     });
   }
 
-  private createMainMenu(): Menu {
-    const template: Array<MenuItemConstructorOptions | MenuItem> = [
+  private createMainMenu(recentCredentials: ServerCredentials[] = []): Menu {
+    const recentlyOpenedMenuTemplate: Array<MenuItemConstructorOptions> = this.createRecentlyOpenedMenuTemplate(recentCredentials);
+    const template: Array<MenuItemConstructorOptions> = [
       {
         label: 'File',
         submenu: [
           {
-            label: 'Open',
+            label: 'Open Server...',
             click: (): void => { this.sendMenuCommand(MenuCommand.OpenServer) }
+          },
+          {
+            id: RECENTLY_OPENED_MENU_ID,
+            label: 'Open Recent',
+            submenu: recentlyOpenedMenuTemplate
           },
           { type: 'separator' },
           this.isMac ? { role: 'close' }
@@ -121,11 +143,54 @@ export class Application {
     return Menu.buildFromTemplate(template);
   }
 
-  private sendMenuCommand(menuCommand: MenuCommand): void {
+  private createRecentlyOpenedMenuTemplate(recentCredentials: ServerCredentials[]): Array<MenuItemConstructorOptions> {
+    const template: Array<MenuItemConstructorOptions> = [];
+
+    if (recentCredentials.length > 0) {
+      recentCredentials.forEach(credentials => {
+        template.push({
+                  label: credentials.alias,
+                  click: (): void => { this.sendMenuCommand(MenuCommand.OpenServer, credentials) }
+                });
+      });
+
+      template.push({ type: 'separator' });
+    }
+
+    template.push({
+              label: 'Clear Recently Opened',
+              enabled: (recentCredentials.length > 0),
+              click: (): void => { this._recentlyOpenedService.clear() }
+            });
+
+    return template;
+  }
+
+  private sendMenuCommand(menuCommand: MenuCommand, args?: any): void {
     if (this._mainWindow) {
-      this._mainWindow.webContents.send(Channel.MenuCommand, menuCommand);
+      this._mainWindow.webContents.send(Channel.MenuCommand, menuCommand, args);
     }
   }
+
+  private handleMainProcessCommand = (args: any): void => {
+    const message: MainCommand = args[0];
+
+    switch (message) {
+      case MainCommand.UpdateRecentlyOpened: {
+        const credentials: ServerCredentials | undefined = args.length > 1 ? args[1] : undefined;
+        if (credentials) {
+          this._recentlyOpenedService.add(credentials);
+        } else {
+// TODO: log the error
+        }
+        break;
+      }
+      default:
+// TODO: log the error
+        // this._log.error(`Unsupported MenuCommand - ${convertToText(message)}`);
+        break;
+    }
+  };
 
   private onElectronActivate = (): void => {
     /* On OS X, it's common to re-create a window in the app when the

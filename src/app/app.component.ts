@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 
 import { environment } from '../environments/environment';
 import { Logger, LogService } from './core/logging';
-import { Server } from './core/model';
-import { Channel, MenuCommand } from './enums';
+import { Server, ServerCredentials } from './core/model';
+import { Channel, MainCommand, MenuCommand } from './enums';
 import { SelectServerComponent, ServerListComponent } from './servers';
 import { ElectronService, ModalService } from './services';
 import { ModalResult } from './ui-components';
@@ -20,36 +20,50 @@ export class AppComponent {
   private readonly _log: Logger;
 
   constructor(private _modalService: ModalService,
-              electronService: ElectronService,
+              private _electronService: ElectronService,
               logService: LogService) {
     this._log = logService.getLogger('AppComponent');
     this._log.info('environment:', environment.name);
 
-    electronService.ipcRenderer?.on(Channel.MenuCommand, (_event, message) => this.handleMenuCommand(message));
+    _electronService.ipcRenderer?.on(Channel.MenuCommand, (_event, ...args) => this.handleMenuCommand(args));
   }
 
   public foo(): void {
     this.handleMenuCommand(MenuCommand.OpenServer);
   }
 
-  private handleMenuCommand = (message: any): void => {
-    switch (message) {
-      case MenuCommand.OpenServer:
-        this.openServer();
-        break;
+  private handleMenuCommand = (args: any): void => {
+    const message: MenuCommand = args[0];
 
+    switch (message) {
+      case MenuCommand.OpenServer: {
+        const credentials: ServerCredentials | undefined = args.length > 1 ? args[1] : undefined;
+        this.openServer(credentials);
+        break;
+      }
       default:
         this._log.error(`Unsupported MenuCommand - ${convertToText(message)}`);
         break;
     }
   };
 
-  private openServer(): void {
-    this._modalService.show<SelectServerComponent>(SelectServerComponent.elementTag)
+  private openServer(credentials: ServerCredentials | undefined): void {
+// TODO: if all properties (inc. password) are set, how about just opening it, without displaying modal?
+    this._modalService.show<SelectServerComponent>(SelectServerComponent.elementTag,
+                                                   { credentials })
                       .subscribe({
                         next: (result: ModalResult) => {
                           if (result.ok) {
-                            this.serverList.addServer(result.data as Server);
+                            const server: Server = result.data as Server;
+                            this.serverList.addServer(server);
+
+                            credentials = new ServerCredentials({
+                              alias: server.alias,
+                              address: server.address,
+                              username: server.username,
+                              password: ''  /* Don't save password (it's stored in plaintext for starters) */
+                            });
+                            this._electronService.sendMainProcessCommand(MainCommand.UpdateRecentlyOpened, credentials);
                           }
                         },
                         error: (error: any) => {

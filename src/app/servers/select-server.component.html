@@ -2,11 +2,11 @@
 <form [formGroup]="this.formGroup" aria-label="Connect Server" (ngSubmit)="onSubmit()">
 	<div>
 		<label>Alias</label>
-		<input type="text" id="alias" formControlName="alias" autocomplete="off">
+		<input type="text" id="alias" formControlName="alias" autocomplete="off" autofocus="true">
 	</div>
 	<div>
 		<label>Server address</label>
-		<input type="url" id="address" formControlName="address" inputmode="url" autocomplete="off" autofocus="true" required>
+		<input type="url" id="address" formControlName="address" inputmode="url" autocomplete="off" required>
 	</div>
 	<p *ngIf="this.addressControl.invalid && (this.addressControl.dirty || this.addressControl.touched)" class="form-validation">
 		<ng-template [ngIf]="this.addressControl.errors?.required">Please enter the server address</ng-template>
@@ -26,7 +26,6 @@
 	<p *ngIf="this.passwordControl.invalid && (this.passwordControl.dirty || this.passwordControl.touched)" class="form-validation">
 		<ng-template [ngIf]="this.passwordControl.errors?.required">Please enter the password</ng-template>
 	</p>
-
 	<footer>
 		<button type="submit">Open</button>
 		<button type="button" (click)="onClickCancel()">Cancel</button>

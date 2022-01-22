@@ -24,6 +24,10 @@ export abstract class FormComponent implements OnDestroy {
     return control;
   }
 
+  public isFormInitialized(): boolean {
+    return Object.keys(this.formGroup.controls).length > 0;
+  }
+
   public isFormValid(): boolean {
     let isValid: boolean = false;
 
@@ -70,7 +74,7 @@ export abstract class FormComponent implements OnDestroy {
   }
 
   protected resetFormControlsState(values: { [key: string]: any } | undefined): void {
-    if (Object.keys(this.formGroup.controls).length > 0) {
+    if (this.isFormInitialized()) {
       if (values) {
         this.formGroup.patchValue(values);
       }

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, Validators } from '@angular/forms';
 
 import { Logger, LogService } from '../core/logging';
@@ -14,6 +14,7 @@ import { ModalComponent } from '../ui-components';
 })
 export class SelectServerComponent extends ModalComponent implements OnInit {
   public static readonly elementTag: string = 'select-server-element';
+  private _credentials: ServerCredentials = new ServerCredentials();
   /* Properties to expose controls requiring validation */
   public addressControl: AbstractControl = new FormControl();
   public usernameControl: AbstractControl = new FormControl();
@@ -30,19 +31,40 @@ export class SelectServerComponent extends ModalComponent implements OnInit {
   public ngOnInit(): void {
 /* eslint-disable @typescript-eslint/unbound-method */
     this.formGroup = this._formBuilder.group({
-      alias: [''],
-      address: ['', [Validators.required,
+      alias: [this._credentials.alias],
+      address: [this._credentials.address, [Validators.required,
 // TODO: sort out regex
                      Validators.pattern('.*')
                     ]],
-      username: ['', [Validators.required]],
-      password: ['', [Validators.required]]
+      username: [this._credentials.username, [Validators.required]],
+      password: [this._credentials.password, [Validators.required]]
 /* eslint-enable @typescript-eslint/unbound-method */
     });
 
     this.addressControl = this.getFormControl('address');
     this.usernameControl = this.getFormControl('username');
     this.passwordControl = this.getFormControl('password');
+  }
+
+  @Input()
+  public get credentials(): ServerCredentials | undefined {
+    return this._credentials;
+  }
+  public set credentials(credentials: ServerCredentials | undefined) {
+    if (credentials) {
+      this._credentials = { ...credentials };   /* Clone it */
+
+      if (this.isFormInitialized()) {
+        this.formGroup.patchValue({
+          alias: credentials.alias,
+          address: credentials.address,
+          username: credentials.username,
+          password: credentials.password
+        });
+      }
+    } else {
+      this._credentials = new ServerCredentials();
+    }
   }
 
   public onSubmit(): void {
@@ -79,6 +101,7 @@ export class SelectServerComponent extends ModalComponent implements OnInit {
         this._serverService.getServer(credentials)
                            .subscribe({
                               next: (server) => {
+                                this._credentials = credentials;
                                 this.ok(server);
                               },
                               error: (error) => {
