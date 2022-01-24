@@ -25,24 +25,24 @@ export class AppComponent {
     this._log = logService.getLogger('AppComponent');
     this._log.info('environment:', environment.name);
 
-    _electronService.ipcRenderer?.on(Channel.MenuCommand, (_event, ...args) => this.handleMenuCommand(args));
+    _electronService.ipcRenderer?.on(Channel.MenuCommand, (_event, ...args) => this.handleMenuCommand(...args));
   }
 
   public foo(): void {
     this.handleMenuCommand(MenuCommand.OpenServer);
   }
 
-  private handleMenuCommand = (args: any): void => {
-    const message: MenuCommand = args[0];
+  private handleMenuCommand = (...args: any[]): void => {
+    const menuCommand: MenuCommand = args[0];
 
-    switch (message) {
+    switch (menuCommand) {
       case MenuCommand.OpenServer: {
         const credentials: ServerCredentials | undefined = args.length > 1 ? args[1] : undefined;
         this.openServer(credentials);
         break;
       }
       default:
-        this._log.error(`Unsupported MenuCommand - ${convertToText(message)}`);
+        this._log.error(`Unsupported MenuCommand - ${convertToText(menuCommand)}`);
         break;
     }
   };

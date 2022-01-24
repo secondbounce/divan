@@ -25,7 +25,7 @@ export class Application {
   public initialize(): void {
     this.createMainWindow();
 
-    ipcMain.on(Channel.MainCommand, (_event, ...args) => this.handleMainProcessCommand(args));
+    ipcMain.on(Channel.MainCommand, (_event, ...args) => this.handleMainProcessCommand(...args));
   }
 
   private createMainWindow(): void {
@@ -166,16 +166,16 @@ export class Application {
     return template;
   }
 
-  private sendMenuCommand(menuCommand: MenuCommand, args?: any): void {
+  private sendMenuCommand(menuCommand: MenuCommand, ...args: any[]): void {
     if (this._mainWindow) {
-      this._mainWindow.webContents.send(Channel.MenuCommand, menuCommand, args);
+      this._mainWindow.webContents.send(Channel.MenuCommand, menuCommand, ...args);
     }
   }
 
-  private handleMainProcessCommand = (args: any): void => {
-    const message: MainCommand = args[0];
+  private handleMainProcessCommand = (...args: any[]): void => {
+    const mainCommand: MainCommand = args[0];
 
-    switch (message) {
+    switch (mainCommand) {
       case MainCommand.UpdateRecentlyOpened: {
         const credentials: ServerCredentials | undefined = args.length > 1 ? args[1] : undefined;
         if (credentials) {
@@ -187,7 +187,7 @@ export class Application {
       }
       default:
 // TODO: log the error
-        // this._log.error(`Unsupported MenuCommand - ${convertToText(message)}`);
+        // this._log.error(`Unsupported MenuCommand - ${convertToText(mainCommand)}`);
         break;
     }
   };
