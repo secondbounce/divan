@@ -5,7 +5,7 @@ import { BrowserWindow, BrowserWindowConstructorOptions, ipcMain, Menu, MenuItem
 // import electronReload from 'electron-reload';
 
 import { ServerCredentials } from '../src/app/core/model';
-import { Channel, MainCommand, MenuCommand } from '../src/app/enums';
+import { Channel, MenuCommand, RendererEvent } from '../src/app/enums';
 import { RecentlyOpenedService } from './services/recently-opened.service';
 
 const RECENTLY_OPENED_MENU_ID: string = 'recently-opened';
@@ -25,7 +25,7 @@ export class Application {
   public initialize(): void {
     this.createMainWindow();
 
-    ipcMain.on(Channel.MainCommand, (_event, ...args) => this.handleMainProcessCommand(...args));
+    ipcMain.on(Channel.RendererEvent, (_event, ...args) => this.handleRendererEvent(...args));
   }
 
   private createMainWindow(): void {
@@ -172,11 +172,11 @@ export class Application {
     }
   }
 
-  private handleMainProcessCommand = (...args: any[]): void => {
-    const mainCommand: MainCommand = args[0];
+  private handleRendererEvent = (...args: any[]): void => {
+    const event: RendererEvent = args[0];
 
-    switch (mainCommand) {
-      case MainCommand.UpdateRecentlyOpened: {
+    switch (event) {
+      case RendererEvent.ServerOpened: {
         const credentials: ServerCredentials | undefined = args.length > 1 ? args[1] : undefined;
         if (credentials) {
           this._recentlyOpenedService.add(credentials);

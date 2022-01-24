@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
   the resulting javascript file will look as if you never imported the module at all.
 */
 import { ipcRenderer, webFrame } from 'electron';
-import { Channel, MainCommand } from '../enums';
+import { Channel, RendererEvent } from '../enums';
 
 @Injectable({
   providedIn: 'root'
@@ -42,7 +42,7 @@ export class ElectronService {
     return !!(window && window.process && window.process.type);
   }
 
-  public sendMainProcessCommand(mainCommand: MainCommand, args?: any): void {
-    this.ipcRenderer?.send(Channel.MainCommand, mainCommand, args);
+  public emitRendererEvent(event: RendererEvent, args?: any): void {
+    this.ipcRenderer?.send(Channel.RendererEvent, event, args);
   }
 }

@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { environment } from '../environments/environment';
 import { Logger, LogService } from './core/logging';
 import { Server, ServerCredentials } from './core/model';
-import { Channel, MainCommand, MenuCommand } from './enums';
+import { Channel, MenuCommand, RendererEvent } from './enums';
 import { SelectServerComponent, ServerListComponent } from './servers';
 import { ElectronService, ModalService } from './services';
 import { ModalResult } from './ui-components';
@@ -63,7 +63,7 @@ export class AppComponent {
                               username: server.username,
                               password: ''  /* Don't save password (it's stored in plaintext for starters) */
                             });
-                            this._electronService.sendMainProcessCommand(MainCommand.UpdateRecentlyOpened, credentials);
+                            this._electronService.emitRendererEvent(RendererEvent.ServerOpened, credentials);
                           }
                         },
                         error: (error: any) => {

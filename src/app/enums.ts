@@ -1,12 +1,13 @@
 export const enum Channel {
   MenuCommand = 'menu-command',
-  MainCommand = 'main-command'
+  RendererEvent = 'renderer-event'
 }
 
 export const enum MenuCommand {
-  OpenServer = 'open-server'
+  OpenServer = 'open-server',
+  DiffDatabases = 'diff-databases'
 }
 
-export const enum MainCommand {
-  UpdateRecentlyOpened = 'update-recently-opened'
+export const enum RendererEvent {
+  ServerOpened = 'server-opened'
 }
