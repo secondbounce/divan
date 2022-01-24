@@ -1,7 +1,6 @@
 import { HttpHeaders } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
-import { Observable, ReplaySubject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, Observable } from 'rxjs';
 
 import { ServerMetaInfo } from '../core/couchdb';
 import { LogService } from '../core/logging';
@@ -13,23 +12,17 @@ import { CouchDbService } from './couchdb.service';
   providedIn: 'root'
 })
 export class ServerService extends BaseService implements OnDestroy {
-  public availableServers$: ReplaySubject<string[]> = new ReplaySubject<string[]>();
-  private readonly _availableServers: Map<string, ServerCredentials> = new Map<string, ServerCredentials>();
+  private readonly _servers: Map<string, Server> = new Map<string, Server>();
 
   constructor(private _couchDbService: CouchDbService,
               logService: LogService) {
     super(logService);
   }
 
-  public ngOnDestroy(): void {
-    super.ngOnDestroy();
-    this.availableServers$.complete();
-  }
-
   public getServerCredentials(serverAliasOrAddress: string): ServerCredentials | undefined {
-    let credentials: ServerCredentials | undefined = this._availableServers.get(serverAliasOrAddress);
+    let server: Server | undefined = this._servers.get(serverAliasOrAddress.toLocaleUpperCase());
 
-    if (typeof(credentials) === 'undefined') {
+    if (typeof(server) === 'undefined') {
       const url: URL = new URL(serverAliasOrAddress);
       url.pathname = '';
       url.search = '';
@@ -37,23 +30,23 @@ export class ServerService extends BaseService implements OnDestroy {
       url.password = '';
       const address: string = url.toString();
 
-      for (const serverCredentials of this._availableServers.values()) {
-        if (serverCredentials.address === address) {
-          credentials = serverCredentials;
+      for (const existingServer of this._servers.values()) {
+        if (existingServer.address === address) {
+          server = existingServer;
           break;
         }
       }
     }
 
-    return credentials;
+    return new ServerCredentials(server);
   }
 
   public getDatabaseUrl(serverAlias: string, database: string): string | undefined {
     let databaseUrl: string | undefined;
-    const credentials: ServerCredentials | undefined = this._availableServers.get(serverAlias);
+    const server: Server | undefined = this._servers.get(serverAlias.toLocaleUpperCase());
 
-    if (credentials) {
-      const url: URL = new URL(credentials.address);
+    if (server) {
+      const url: URL = new URL(server.address);
       url.pathname = database;
       databaseUrl = url.toString();
     }
@@ -62,6 +55,9 @@ export class ServerService extends BaseService implements OnDestroy {
   }
 
   public getServer(credentials: ServerCredentials): Observable<Server> {
+    /* We're not going to check if the server already exists in the list, as this will effectively
+      'refresh' the details, if so.
+    */
     const url: URL = new URL(credentials.address);
     url.pathname = '/';
     const metaInfoUrl: string = url.toString();
@@ -69,15 +65,16 @@ export class ServerService extends BaseService implements OnDestroy {
 
     return this._couchDbService.get<ServerMetaInfo>(metaInfoUrl, headers)
                                .pipe(map((metaInfo) => {
-                                      this._availableServers.set(credentials.alias, credentials);
-                                      this.availableServers$.next(Array.from(this._availableServers.keys())
-                                                                       .sort((a, b) => a.toLocaleUpperCase()
-                                                                                        .localeCompare(b.toLocaleUpperCase())));
-                                      return new Server({
+                                      const newServer: Server = new Server({
                                         ...credentials,
                                         couchDbVersion: metaInfo.version,
                                         databases: []
                                       });
+
+                                      /* Obviously, this will replace any existing server with the same alias */
+                                      this._servers.set(credentials.alias.toLocaleUpperCase(), newServer);
+
+                                      return newServer;
                                     }));
   }
 
