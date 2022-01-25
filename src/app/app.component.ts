@@ -3,8 +3,9 @@ import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { environment } from '../environments/environment';
 import { Logger, LogService } from './core/logging';
 import { Server, ServerCredentials } from './core/model';
+import { DatabaseDiffOptionsComponent, SelectServerComponent } from './elements';
 import { Channel, MenuCommand, RendererEvent } from './enums';
-import { SelectServerComponent, ServerListComponent } from './servers';
+import { ServerListComponent } from './servers';
 import { ElectronService, ModalService } from './services';
 import { ModalResult } from './ui-components';
 import { convertToText } from './utility';
@@ -41,6 +42,10 @@ export class AppComponent {
         this.openServer(credentials);
         break;
       }
+      case MenuCommand.DiffDatabases:
+        this.diffDatabases();
+        break;
+
       default:
         this._log.error(`Unsupported MenuCommand - ${convertToText(menuCommand)}`);
         break;
@@ -65,6 +70,18 @@ export class AppComponent {
                             });
                             this._electronService.emitRendererEvent(RendererEvent.ServerOpened, credentials);
                           }
+                        },
+                        error: (error: any) => {
+                          this._log.warn(error);
+                        }
+                      });
+  }
+
+  private diffDatabases(): void {
+    this._modalService.show<DatabaseDiffOptionsComponent>(DatabaseDiffOptionsComponent.elementTag)
+                      .subscribe({
+                        next: (result: ModalResult) => {
+                          console.log(result.data);
                         },
                         error: (error: any) => {
                           this._log.warn(error);

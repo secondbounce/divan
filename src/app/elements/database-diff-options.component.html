@@ -1,0 +1,42 @@
+<div class="background"></div>
+<form [formGroup]="this.formGroup" aria-label="Options" (ngSubmit)="onSubmit()">
+	<div class="source-target">
+		<div>
+			<div>
+				<label for="sourceServer">Source</label>
+				<select id="sourceServer" formControlName="sourceServer" (change)="updateSourceDatabases($event)" selected="" required>
+					<option value="" selected></option>
+					<option *ngFor="let server of this.availableServers">{{ server }}</option>
+				</select>
+				<select id="sourceDatabase" formControlName="sourceDatabase" selected="" required>
+					<option value="" selected></option>
+					<option *ngFor="let database of this.sourceDatabases">{{ database }}</option>
+				</select>
+				<p *ngIf="this.sourceDatabaseControl.invalid && (this.sourceDatabaseControl.dirty || this.sourceDatabaseControl.touched)" class="form-validation">
+					<ng-template [ngIf]="this.sourceDatabaseControl.errors?.required">Please select a database for the source</ng-template>
+				</p>
+			</div>
+			<div>
+				<label for="targetServer">Target</label>
+				<select id="targetServer" formControlName="targetServer" (change)="updateTargetDatabases($event)" selected="" required>
+					<option value="" selected></option>
+					<option *ngFor="let server of this.availableServers">{{ server }}</option>
+				</select>
+				<select id="targetDatabase" formControlName="targetDatabase" selected="" required>
+					<option value="" selected></option>
+					<option *ngFor="let database of this.targetDatabases">{{ database }}</option>
+				</select>
+				<p *ngIf="this.targetDatabaseControl.invalid && (this.targetDatabaseControl.dirty || this.targetDatabaseControl.touched)" class="form-validation">
+					<ng-template [ngIf]="this.targetDatabaseControl.errors?.required">Please select a database for the target</ng-template>
+				</p>
+			</div>
+		</div>
+		<div>
+			<button type="button" (click)="swapSourceTarget()">Swap</button>
+		</div>
+	</div>
+	<footer>
+		<button type="submit">Open</button>
+		<button type="button" (click)="onClickCancel()">Cancel</button>
+	</footer>
+</form>

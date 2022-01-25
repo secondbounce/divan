@@ -1,21 +1,12 @@
-import { Injectable, Injector } from '@angular/core';
-import { createCustomElement, NgElement, WithProperties } from '@angular/elements';
+import { Injectable } from '@angular/core';
+import { NgElement, WithProperties } from '@angular/elements';
 import { first, fromEvent, map, Observable } from 'rxjs';
 
-import { SelectServerComponent } from '../servers';
-import { ModalComponent, ModalResult, PopupComponent } from '../ui-components';
+import { ModalComponent, ModalResult } from '../ui-components';
 
 @Injectable()
 export class ModalService {
-  constructor(injector: Injector) {
-    let elementConstructor: CustomElementConstructor = createCustomElement(PopupComponent, { injector });
-    customElements.define(PopupComponent.elementTag, elementConstructor);
-
-    elementConstructor = createCustomElement(SelectServerComponent, { injector });
-    customElements.define(SelectServerComponent.elementTag, elementConstructor);
-  }
-
-// TODO: save the elementTags when we define them above, so they don't have to be passed here
+// TODO: save the elementTags when we define them, so they don't have to be passed here
   public show<ModalType extends ModalComponent>(elementTag: string, properties?: { [key: string]: any }): Observable<ModalResult> {
     const modal: NgElement & WithProperties<ModalType> = document.createElement(elementTag) as any;
 

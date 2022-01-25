@@ -1,6 +1,6 @@
 import { HttpHeaders } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { map, Observable, ReplaySubject } from 'rxjs';
 
 import { ServerMetaInfo } from '../core/couchdb';
 import { LogService } from '../core/logging';
@@ -12,11 +12,17 @@ import { CouchDbService } from './couchdb.service';
   providedIn: 'root'
 })
 export class ServerService extends BaseService implements OnDestroy {
+  public serverAliases$: ReplaySubject<string[]> = new ReplaySubject<string[]>();
   private readonly _servers: Map<string, Server> = new Map<string, Server>();
 
   constructor(private _couchDbService: CouchDbService,
               logService: LogService) {
     super(logService);
+  }
+
+  public ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.serverAliases$.complete();
   }
 
   public getServerCredentials(serverAliasOrAddress: string): ServerCredentials | undefined {
@@ -73,6 +79,12 @@ export class ServerService extends BaseService implements OnDestroy {
 
                                       /* Obviously, this will replace any existing server with the same alias */
                                       this._servers.set(credentials.alias.toLocaleUpperCase(), newServer);
+
+                                      /* We can't use _servers.keys() since they're converted to uppercase... */
+                                      this.serverAliases$.next(Array.from(this._servers.values())
+                                                                    .map(server => server.alias)
+                                                                    .sort((a, b) => a.toLocaleUpperCase()
+                                                                                     .localeCompare(b.toLocaleUpperCase())));
 
                                       return newServer;
                                     }));

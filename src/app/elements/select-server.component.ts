@@ -34,8 +34,8 @@ export class SelectServerComponent extends ModalComponent implements OnInit {
       alias: [this._credentials.alias],
       address: [this._credentials.address, [Validators.required,
 // TODO: sort out regex
-                     Validators.pattern('.*')
-                    ]],
+                                            Validators.pattern('.*')
+                                           ]],
       username: [this._credentials.username, [Validators.required]],
       password: [this._credentials.password, [Validators.required]]
 /* eslint-enable @typescript-eslint/unbound-method */

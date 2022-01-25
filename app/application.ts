@@ -8,7 +8,7 @@ import { ServerCredentials } from '../src/app/core/model';
 import { Channel, MenuCommand, RendererEvent } from '../src/app/enums';
 import { RecentlyOpenedService } from './services/recently-opened.service';
 
-const RECENTLY_OPENED_MENU_ID: string = 'recently-opened';
+const DIFF_DATABASES_MENU_ID: string = 'diff-databases';
 
 export class Application {
   public readonly isMac: boolean;
@@ -112,9 +112,15 @@ export class Application {
             click: (): void => { this.sendMenuCommand(MenuCommand.OpenServer) }
           },
           {
-            id: RECENTLY_OPENED_MENU_ID,
             label: 'Open Recent',
             submenu: recentlyOpenedMenuTemplate
+          },
+          { type: 'separator' },
+          {
+            id: DIFF_DATABASES_MENU_ID,
+            label: 'Diff Databases',
+            enabled: false,
+            click: (): void => { this.sendMenuCommand(MenuCommand.DiffDatabases) }
           },
           { type: 'separator' },
           this.isMac ? { role: 'close' }
@@ -179,7 +185,7 @@ export class Application {
       case RendererEvent.ServerOpened: {
         const credentials: ServerCredentials | undefined = args.length > 1 ? args[1] : undefined;
         if (credentials) {
-          this._recentlyOpenedService.add(credentials);
+          this.onServerOpened(credentials);
         } else {
 // TODO: log the error
         }
@@ -189,6 +195,15 @@ export class Application {
 // TODO: log the error
         // this._log.error(`Unsupported MenuCommand - ${convertToText(mainCommand)}`);
         break;
+    }
+  };
+
+  private onServerOpened = (credentials: ServerCredentials): void => {
+    this._recentlyOpenedService.add(credentials);
+
+    const diffDatabasesMenuItem: Electron.MenuItem | null | undefined = Menu.getApplicationMenu()?.getMenuItemById(DIFF_DATABASES_MENU_ID);
+    if (diffDatabasesMenuItem) {
+      diffDatabasesMenuItem.enabled = true;
     }
   };
 
