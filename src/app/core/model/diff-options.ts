@@ -1,7 +1,6 @@
 export interface DiffOptions {
-  sourceUrl: string;
+  sourceAlias: string;
   sourceDb: string;
-  targetUrl: string;
+  targetAlias: string;
   targetDb: string;
-  includeDocs: boolean;
 }

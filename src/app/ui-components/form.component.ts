@@ -44,7 +44,7 @@ export abstract class FormComponent implements OnDestroy {
   }
 
   /** Virtual method intended to be overridden in forms that need to perform operations when invalid
-   * controls are identified.
+   * controls are identified, such as switch tabs, for example.
    */
   public markInvalidControls(_invalidControls: AbstractControl[]): void {
     /* Nothing to do */

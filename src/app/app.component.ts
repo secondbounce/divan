@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { environment } from '../environments/environment';
 import { Logger, LogService } from './core/logging';
-import { Server, ServerCredentials } from './core/model';
+import { DiffOptions, Server, ServerCredentials } from './core/model';
 import { DatabaseDiffOptionsComponent, SelectServerComponent } from './elements';
 import { Channel, MenuCommand, RendererEvent } from './enums';
 import { ServerListComponent } from './servers';
@@ -22,6 +23,7 @@ export class AppComponent {
 
   constructor(private _modalService: ModalService,
               private _electronService: ElectronService,
+              private _router: Router,
               logService: LogService) {
     this._log = logService.getLogger('AppComponent');
     this._log.info('environment:', environment.name);
@@ -81,7 +83,15 @@ export class AppComponent {
     this._modalService.show<DatabaseDiffOptionsComponent>(DatabaseDiffOptionsComponent.elementTag)
                       .subscribe({
                         next: (result: ModalResult) => {
-                          console.log(result.data);
+                          if (result.ok) {
+                            const options: DiffOptions = result.data as DiffOptions;
+                            this._router.navigate(['/diff/db',
+                                                   options.sourceAlias,
+                                                   options.sourceDb,
+                                                   options.targetAlias,
+                                                   options.targetDb
+                                                  ]);
+                          }
                         },
                         error: (error: any) => {
                           this._log.warn(error);

@@ -1,3 +1,4 @@
+export * from './database-credentials';
 export * from './diff-options';
 export * from './doc-info';
 export * from './server';

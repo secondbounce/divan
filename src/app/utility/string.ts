@@ -1,5 +1,15 @@
 import { JSON_STRINGIFY_SPACES } from '../constants';
 
+/**
+ * @returns true if the arrays contain the same string values, ignoring the array order
+ */
+export function isEqualStringArrays(array1: string[], array2: string[]): boolean {
+  return array1
+      && array2
+      && (array1.length === array2.length)
+      && (array1.filter(item => !array2.includes(item)).length === 0);
+}
+
 /** Converts value to string using `JSON.stringify()` */
 export function stringify(value: any): string {
   return JSON.stringify(decycle(value), undefined, JSON_STRINGIFY_SPACES);
@@ -111,4 +121,21 @@ function decycle(object: any): any {
     }
     return value;
   }(object, '$'));
+}
+
+export async function getSha1HashValue(source: string): Promise<string> {
+  let hash: string = '';
+
+  if (source.length > 0) {
+    const uint8Data: Uint8Array = new TextEncoder().encode(source);
+    const hashBuffer: ArrayBuffer = await crypto.subtle.digest('SHA-1', uint8Data);
+    const hashArray: number[] = Array.from(new Uint8Array(hashBuffer));
+
+    /* eslint-disable @typescript-eslint/no-magic-numbers */
+    hash = hashArray.map(b => b.toString(16)
+                               .padStart(2, '0'))
+                               .join('');
+  }
+
+  return hash;
 }

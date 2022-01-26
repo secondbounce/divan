@@ -14,13 +14,6 @@ import { ModalComponent } from '../ui-components';
 })
 export class DatabaseDiffOptionsComponent extends ModalComponent implements OnInit {
   public static readonly elementTag: string = 'database-diff-options-element';
-  @Input() public options: DiffOptions = {
-    sourceUrl: '',
-    sourceDb: '',
-    targetUrl: '',
-    targetDb: '',
-    includeDocs: false
-  };
   public availableServers: string[] = [];
   public sourceDatabases: string[] = [];
   public targetDatabases: string[] = [];
@@ -29,6 +22,12 @@ export class DatabaseDiffOptionsComponent extends ModalComponent implements OnIn
   public sourceDatabaseControl: AbstractControl = new FormControl();
   public targetServerControl: AbstractControl = new FormControl();
   public targetDatabaseControl: AbstractControl = new FormControl();
+  private _options: DiffOptions = {
+    sourceAlias: '',
+    sourceDb: '',
+    targetAlias: '',
+    targetDb: ''
+  };
 
   constructor(private _serverService: ServerService,
               private _formBuilder: FormBuilder,
@@ -56,22 +55,75 @@ export class DatabaseDiffOptionsComponent extends ModalComponent implements OnIn
     this.sourceDatabaseControl = this.getFormControl('sourceDatabase');
     this.targetServerControl = this.getFormControl('targetServer');
     this.targetDatabaseControl = this.getFormControl('targetDatabase');
+
+    this.updateForm();
+  }
+
+  @Input()
+  public get options(): DiffOptions {
+    return this._options;
+  }
+  public set options(options: DiffOptions) {
+    this._options = options;
+
+    if (this.isFormInitialized()) {
+      this.updateForm();
+    }
+  }
+
+  private updateForm(): void {
+    /* We need to update the database lists first, otherwise setting the
+      SELECTs won't work as there won't be a matching option.
+    */
+    this.updateDatabases(this.options.sourceAlias, this.sourceDatabases)
+        .subscribe(sourceAlias => {
+          /* Must ensure SELECTs have been updated with options before setting values */
+          this._cdRef.detectChanges();
+
+          if (sourceAlias.length === 0) {
+            this.options.sourceAlias = '';
+          }
+
+          this.resetFormControlsState({
+            sourceServer: sourceAlias,
+            sourceDatabase: this.options.sourceDb
+          });
+        });
+
+    this.updateDatabases(this.options.targetAlias, this.targetDatabases)
+        .subscribe(targetAlias => {
+          /* Must ensure SELECTs have been updated with options before setting values */
+          this._cdRef.detectChanges();
+
+          if (targetAlias.length === 0) {
+            this.options.targetAlias = '';
+          }
+
+          this.resetFormControlsState({
+            targetServer: targetAlias,
+            targetDatabase: this.options.targetDb
+          });
+        });
   }
 
   public updateSourceDatabases($event: Event): void {
     const select: HTMLSelectElement = $event.currentTarget as HTMLSelectElement;
-    this.updateDatabases(select.value, this.sourceDatabases).subscribe();
+    this.updateDatabases(select.value, this.sourceDatabases)
+        .subscribe();
   }
 
   public updateTargetDatabases($event: Event): void {
     const select: HTMLSelectElement = $event.currentTarget as HTMLSelectElement;
-    this.updateDatabases(select.value, this.targetDatabases).subscribe();
+    this.updateDatabases(select.value, this.targetDatabases)
+        .subscribe();
   }
 
   private updateDatabases(serverAliasOrAddress: string, databases: string[]): Observable<string> {
     databases.length = 0;   /* Clear existing dbs regardless (won't be valid if no credentials found anyway) */
 
-    const credentials: ServerCredentials | undefined = this._serverService.getServerCredentials(serverAliasOrAddress);
+    const credentials: ServerCredentials | undefined = serverAliasOrAddress.length > 0
+                                                          ? this._serverService.getServerCredentials(serverAliasOrAddress)
+                                                          : undefined;
     if (credentials) {
       return this._serverService.getDatabases(credentials)
                                 .pipe(map((databaseNames) => {
@@ -110,9 +162,9 @@ export class DatabaseDiffOptionsComponent extends ModalComponent implements OnIn
 
       if (sourceCredentials) {
         if (targetCredentials) {
-          this.options.sourceUrl = sourceCredentials.address;
+          this.options.sourceAlias = formValues.sourceServer;
           this.options.sourceDb = formValues.sourceDatabase;
-          this.options.targetUrl = targetCredentials.address;
+          this.options.targetAlias = formValues.targetServer;
           this.options.targetDb = formValues.targetDatabase;
           this.ok(this.options);
         } else {
