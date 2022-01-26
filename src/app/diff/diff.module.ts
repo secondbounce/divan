@@ -4,9 +4,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 
 import { DatabaseDiffPage } from './database-diff.page';
+import { DocumentDiffPage } from './document-diff.page';
 
 const routes: Routes = [
-  { path: 'db/:sourceAlias/:sourceDb/:targetAlias/:targetDb', component: DatabaseDiffPage }
+  { path: 'db/:sourceAlias/:sourceDb/:targetAlias/:targetDb', component: DatabaseDiffPage },
+  { path: 'doc/:sourceAlias/:sourceDb/:sourceDocId/:targetAlias/:targetDb/:targetDocId', component: DocumentDiffPage },
+  { path: 'doc/:sourceAlias/:sourceDb/:sourceDocId/:targetAlias/:targetDb', component: DocumentDiffPage }
 ];
 
 @NgModule({
@@ -17,10 +20,12 @@ const routes: Routes = [
     RouterModule.forChild(routes)
   ],
   exports: [
-    DatabaseDiffPage
+    DatabaseDiffPage,
+    DocumentDiffPage
   ],
   declarations: [
-    DatabaseDiffPage
+    DatabaseDiffPage,
+    DocumentDiffPage
   ],
   providers: []
 })

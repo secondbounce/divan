@@ -1,3 +1,4 @@
+export * from './content-sanitizer.service';
 export * from './couchdb.service';
 export * from './couchdb-export.service';
 export * from './document.service';

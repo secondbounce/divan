@@ -6,6 +6,8 @@ import { DiffOptions, ServerCredentials } from '../core/model';
 import { ServerService } from '../services';
 import { ModalComponent } from '../ui-components';
 
+// TODO: if no available servers, should display 'empty state' warning and close the form
+
 @Component({
   selector: 'app-database-diff-options',
   templateUrl: './database-diff-options.component.html',

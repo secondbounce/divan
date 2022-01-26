@@ -123,6 +123,20 @@ function decycle(object: any): any {
   }(object, '$'));
 }
 
+/**
+ * @param format String format using numeric placeholders - {0}, {1}, etc - for the location
+ * of each argument in the output.
+ */
+export function stringFormat(format: string, ...args: any[] ): string {
+  return format.replace(/(?<!\\){(\d+)}/g, (_match, index) => {
+                  const arg: any = args[index];
+                  return typeof(arg) === 'undefined' ? ''
+                                                     : (arg instanceof Date ? arg.toLocaleDateString()
+                                                                            : arg);
+                })
+               .replace('\\{', '{');
+}
+
 export async function getSha1HashValue(source: string): Promise<string> {
   let hash: string = '';
 

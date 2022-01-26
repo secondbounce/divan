@@ -1,0 +1,79 @@
+// TODO: use variables for colours
+
+$side-spacing: 5px;
+$panel-gap-per-side: 2px;
+
+:host {
+  display: grid;
+  grid-template-areas: "source-name target-name ."
+                       "source-pane target-pane vscroll"
+                       "hscroll     hscroll     .";
+  grid-template-columns: 1fr 1fr auto;
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+  overflow: hidden;
+  padding-inline: $side-spacing;
+  width: 100%;
+}
+
+header {
+  label {
+    padding: 0.25em 0.5em;
+  }
+}
+
+.source-header {
+  grid-area: source-name;
+  margin-right: $panel-gap-per-side;
+}
+
+.target-header {
+  grid-area: target-name;
+  margin-left: $panel-gap-per-side;
+}
+
+section {
+  border: gray solid 0.1px;
+  overflow: hidden;
+
+  &.source {
+    grid-area: source-pane;
+    margin-right: $panel-gap-per-side;
+  }
+  &.target {
+    grid-area: target-pane;
+    margin-left: $panel-gap-per-side;
+  }
+  > div {
+    display: inline-block;
+// TODO: pick a better font?
+    font-family: monospace;
+    min-width: 100%;
+  }
+}
+
+.vscroll-only {
+  grid-area: vscroll;
+  margin-left: -1px;    /* Hides inner DIV (can't be done on DIV as Chrome hides scrollbar for non-visible elements) */
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;   /* Keeping scrollbar visible solves a few layout issues that `auto` causes */
+
+  div {
+    height: 100%; /* Initial value - will be overridden at runtime */
+    width: 1px;   /* Requires a width for scrollbar to be displayed */
+  }
+}
+
+.hscroll-only {
+  grid-area: hscroll;
+  margin-top: -1px;     /* Hides inner DIV (can't be done on DIV as Chrome hides scrollbar for non-visible elements) */
+  max-width: 100%;
+  overflow-x: scroll;   /* Keeping scrollbar visible solves a few layout issues that `auto` causes */
+  overflow-y: hidden;
+
+  div {
+    height: 1px;  /* Requires a height for scrollbar to be displayed */
+    width: 100%;  /* Initial value - will be overridden at runtime */
+  }
+}

@@ -8,7 +8,7 @@ import { AppComponent } from './app.component';
 import { LogService } from './core/logging';
 import { ElementsModule } from './elements/elements.module';
 import { ServersModule } from './servers/servers.module';
-import { CouchDbExportService, CouchDbService, DocumentService, ElectronService, ModalService, ServerService } from './services';
+import { ContentSanitizerService, CouchDbExportService, CouchDbService, DocumentService, ElectronService, ModalService, ServerService } from './services';
 import { UiComponentsModule } from './ui-components/ui-components.module';
 
 @NgModule({
@@ -25,6 +25,7 @@ import { UiComponentsModule } from './ui-components/ui-components.module';
     ElementsModule
   ],
   providers: [
+    ContentSanitizerService,
     CouchDbExportService,
     CouchDbService,
     DocumentService,

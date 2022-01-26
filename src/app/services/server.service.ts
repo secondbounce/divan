@@ -26,25 +26,32 @@ export class ServerService extends BaseService implements OnDestroy {
   }
 
   public getServerCredentials(serverAliasOrAddress: string): ServerCredentials | undefined {
-    let server: Server | undefined = this._servers.get(serverAliasOrAddress.toLocaleUpperCase());
+    let credentials: ServerCredentials | undefined;
+    const server: Server | undefined = this._servers.get(serverAliasOrAddress.toLocaleUpperCase());
 
-    if (typeof(server) === 'undefined') {
-      const url: URL = new URL(serverAliasOrAddress);
-      url.pathname = '';
-      url.search = '';
-      url.username = '';
-      url.password = '';
-      const address: string = url.toString();
+    if (server) {
+      credentials = new ServerCredentials(server);
+    } else {
+      try {
+        const url: URL = new URL(serverAliasOrAddress);
+        url.pathname = '';
+        url.search = '';
+        url.username = '';
+        url.password = '';
+        const address: string = url.toString();
 
-      for (const existingServer of this._servers.values()) {
-        if (existingServer.address === address) {
-          server = existingServer;
-          break;
+        for (const existingServer of this._servers.values()) {
+          if (existingServer.address === address) {
+            credentials = new ServerCredentials(existingServer);
+            break;
+          }
         }
+      } catch {
+        /* Probably just an incorrect alias, so not a valid URL */
       }
     }
 
-    return new ServerCredentials(server);
+    return credentials;
   }
 
   public getDatabaseUrl(serverAlias: string, database: string): string | undefined {

@@ -64,12 +64,12 @@
 			<td></td>
 			<td></td>
 		</tr>
-		<tr *ngFor="let data of this.designDocData" [ngClass]="{'identical': data.identical}">
+		<tr *ngFor="let data of this.designDocData" [ngClass]="{'identical': data.identical}" (dblclick)="showDocumentDiff(data.sourceDoc?._id || '')">
 			<td class="level2">{{ data.docId }}</td>
 			<td class="is-family-code">{{ data.sourceRev }}</td>
 			<td class="is-family-code">{{ data.targetRev }}</td>
 			<td class="actions">
-				<!-- TODO: add action buttons -->
+				<button *ngIf="data.sourceDoc" (click)="showDocumentDiff(data.sourceDoc?._id || '')">Diff</button>
 			</td>
 		</tr>
 	</tbody>

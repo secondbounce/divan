@@ -1,7 +1,7 @@
 import { Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { forkJoin, Observable, takeUntil } from 'rxjs';
 
 import { Database, DESIGN_DOC_ID_PREFIX, DesignDocument } from '../core/couchdb';
@@ -46,6 +46,7 @@ export class DatabaseDiffPage extends PageComponent implements OnInit {
               private _couchDbExportService: CouchDbExportService,
               private _modalService: ModalService,
               private _location: Location,
+              private _router: Router,
               logService: LogService,
               titleService: Title) {
     super(titleService);
@@ -108,16 +109,18 @@ export class DatabaseDiffPage extends PageComponent implements OnInit {
                                                                                        this.diffOptions.targetDb,
                                                                                        false);
 
-      forkJoin([ sourceDb, targetDb ]).subscribe((databases) => {
-                                        this.source = databases[0];
-                                        this.target = databases[1];
+      forkJoin([sourceDb,
+                targetDb
+              ]).subscribe((databases) => {
+                  this.source = databases[0];
+                  this.target = databases[1];
 
-                                        if (this.source._design && this.target._design) {
-                                          const sourceDesignDocs: DesignDocument[] = Object.values(this.source._design);
-                                          const targetDesignDocs: DesignDocument[] = Object.values(this.target._design);
-                                          this.generateDesignDocData(sourceDesignDocs, targetDesignDocs);
-                                        }
-                                      });
+                  if (this.source._design && this.target._design) {
+                    const sourceDesignDocs: DesignDocument[] = Object.values(this.source._design);
+                    const targetDesignDocs: DesignDocument[] = Object.values(this.target._design);
+                    this.generateDesignDocData(sourceDesignDocs, targetDesignDocs);
+                  }
+                });
     }
   }
 
@@ -144,6 +147,20 @@ export class DatabaseDiffPage extends PageComponent implements OnInit {
   public areEqual(source: string[] | undefined, target: string[] | undefined): boolean {
     return (source && target) ? isEqualStringArrays(source, target)
                               : false;
+  }
+
+  public showDocumentDiff(docId: string): void {
+    if (docId.length > 0) {
+      this._router.navigate(['/diff/doc',
+                             this.diffOptions.sourceAlias,
+                             this.diffOptions.sourceDb,
+                             docId,
+                             this.diffOptions.targetAlias,
+                             this.diffOptions.targetDb
+                            ]);
+
+
+    }
   }
 
   private updateLocation(): void {
@@ -207,9 +224,9 @@ export class DatabaseDiffPage extends PageComponent implements OnInit {
                               sourceDoc?: DesignDocument,
                               targetDoc?: DesignDocument): void {
     /* HACK ALERT!  Although doc revisions are supposed to be an MD5 hash of the doc contents
-      (minus the id and rev) and should therefore be the same for docs with identical contents,
-      this doesn't seem to always be the case.  So for comparison purposes, we'll calculate
-      the SHA-1 hash instead.
+      (minus the id and rev) - see https://docs.couchdb.org/en/stable/intro/api.html?highlight=hash#revisions
+      - and should therefore be the same for docs with identical contents, this isn't always
+      the case exactly.  So for comparison purposes, we'll calculate the SHA-1 hash instead.
     */
     forkJoin([
       getSha1HashValue(this.getValueForHash(sourceDoc)),

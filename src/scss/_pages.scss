@@ -1,0 +1,45 @@
+/* This styling is targets dynamically-added HTML content.  Defining this in the
+  corresponding .scss file for the component won't work as the compiler will scope
+  the selectors to the component, but the dynamic HTML won't include the scope class
+  so won't be targetted correctly.  Defining this globally gets around this.
+*/
+
+// TODO: use variables for colours
+
+app-document-diff {
+  .missing {
+    /* We should be able to use `repeating-linear-gradient` to draw diagonal lines, like:
+        background: repeating-linear-gradient(135deg, #e0e0e0, #e0e0e0 0.5px, transparent 0.5px, transparent 4px);
+      but browser implementations are consistently 'janky', drawing the lines with kinks and
+      varying widths.  So for now, we'll use an SVG pattern instead.
+    */
+    background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23e0e0e0' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  .added {
+    background-color: #e6fcf4;
+
+    ins {
+      background-color: #beffe7;
+      color: #1d4a3a;
+    }
+  }
+  .changed {
+    background-color: #f9e2d7;
+
+    ins,
+    del {
+      background-color: #ffcfb8;
+      color: #752d0a;
+    }
+  }
+  span {
+    display: inline-block;
+    padding-inline-end: 0.5em;  /* A bit of space at end when scrolled right over */
+    white-space: nowrap;
+  }
+  ins,
+  del {
+    display: inline-block;
+    text-decoration: none;
+  }
+}

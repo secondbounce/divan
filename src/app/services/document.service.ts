@@ -16,6 +16,11 @@ export class DocumentService extends BaseService {
     super(logService);
   }
 
+  public getDocument(dbCredentials: DatabaseCredentials, docId: string): Observable<Document> {
+    const [url, headers ] = this.getUrlAndHeaders(dbCredentials.serverCredentials, `/${dbCredentials.name}/${docId}`);
+    return this._couchDbService.get<Document>(url, headers);
+  }
+
   public getDesignDocuments(database: DatabaseCredentials): Observable<DesignDocument[]> {
     return this.getDesignDocuments$(database, true)
                .pipe(map((allDocs: AllDocuments) => {

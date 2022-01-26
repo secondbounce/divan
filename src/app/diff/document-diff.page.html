@@ -1,0 +1,10 @@
+<header class="source-header"><label>{{ this.sourceTitle }}</label></header>
+<section #source class="source">
+	<div [innerHtml]="this.sourceDiffs"></div>
+</section>
+<header class="target-header"><label>{{ this.targetTitle }}</label></header>
+<section #target class="target">
+	<div [innerHtml]="this.targetDiffs"></div>
+</section>
+<div #vscroller class="vscroll-only" (scroll)="updateVerticalScroll($event)"><div></div></div>
+<div #hscroller class="hscroll-only" (scroll)="updateHorizontalScroll($event)"><div></div></div>
