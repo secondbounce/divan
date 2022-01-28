@@ -14,9 +14,11 @@ export class Application {
   public readonly isMac: boolean;
   private _mainWindow: BrowserWindow | undefined;
   private _recentlyOpenedService: RecentlyOpenedService = RecentlyOpenedService.instance;
+  private _debugMode: boolean;
 
-  constructor(private _electronApp: Electron.App, private _debugMode: boolean) {
+  constructor(private _electronApp: Electron.App) {
     this.isMac = process.platform === 'darwin';
+    this._debugMode = !_electronApp.isPackaged;
 
     _electronApp.on('activate', this.onElectronActivate);
     _electronApp.on('window-all-closed', this.onElectronWindowAllClosed);
