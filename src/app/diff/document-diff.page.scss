@@ -1,5 +1,3 @@
-// TODO: use variables for colours
-
 $side-spacing: 5px;
 $panel-gap-per-side: 2px;
 
@@ -17,8 +15,14 @@ $panel-gap-per-side: 2px;
 }
 
 header {
+  align-items: center;
+  display: flex;
+
   label {
+    overflow: hidden;
     padding: 0.25em 0.5em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 
@@ -33,7 +37,7 @@ header {
 }
 
 section {
-  border: gray solid 0.1px;
+  border: var(--dv-border-color-default) solid 0.1px;
   overflow: hidden;
 
   &.source {

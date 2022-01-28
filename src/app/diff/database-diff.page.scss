@@ -1,4 +1,3 @@
-// TODO: use variables for colours
 // TODO: sort out wrapping in table
 
 .level1 {
@@ -14,6 +13,6 @@
 }
 
 .identical {
-  background-color: #effaf3;
-  color: #48c774;
+  background-color: var(--dv-diff-identical-bg);
+  color: var(--dv-diff-identical-color);
 }

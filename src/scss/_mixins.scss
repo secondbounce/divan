@@ -11,7 +11,7 @@ $form-padding:  1em;
   height: 100%;
 
   .background {
-    background-color: #0000004f;
+    background-color: var(--dv-modal-overlay-bg);
     position: absolute;
     top: 0;
     left: 0;
@@ -21,13 +21,14 @@ $form-padding:  1em;
   }
 
   form {
-    background-color: white;
-    border: 1px solid rgb(133, 133, 133);
+    background-color: var(--dv-form-bg);
+    border: 1px solid var(--dv-form-border);
     padding: 0 $form-padding $form-padding;
     z-index: 2;
 
     &::before {
-      background-color: antiquewhite;
+      /* Create a dummy header */
+      background-color: var(--dv-form-header-bg);
       content: attr(aria-label);
       display: block;
       line-height: 1;
