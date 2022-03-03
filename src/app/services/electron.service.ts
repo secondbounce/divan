@@ -1,9 +1,9 @@
-import * as childProcess from 'child_process';
-import * as fs from 'fs';
-import { Injectable } from '@angular/core';
 /* If you import a module but never use any of the imported values other than as TypeScript types,
   the resulting javascript file will look as if you never imported the module at all.
 */
+import * as childProcess from 'child_process';
+import * as fs from 'fs';
+import { Injectable } from '@angular/core';
 import { ipcRenderer, webFrame } from 'electron';
 import { Channel, RendererEvent } from '../enums';
 
@@ -11,16 +11,15 @@ import { Channel, RendererEvent } from '../enums';
   providedIn: 'root'
 })
 export class ElectronService {
-  public readonly ipcRenderer?: typeof ipcRenderer;
   public readonly webFrame?: typeof webFrame;
   public readonly childProcess?: typeof childProcess;
   public readonly fs?: typeof fs;
+  private readonly _ipcRenderer?: typeof ipcRenderer;
 
   constructor() {
     if (this.isElectron) {
-      this.ipcRenderer = window.require('electron').ipcRenderer;
+      this._ipcRenderer = window.require('electron').ipcRenderer;
       this.webFrame = window.require('electron').webFrame;
-
       this.childProcess = window.require('child_process');
       this.fs = window.require('fs');
 
@@ -35,6 +34,8 @@ export class ElectronService {
       // If you want to use a NodeJS 3rd party deps in Renderer process,
       // ipcRenderer.invoke can serve many common use cases.
       // https://www.electronjs.org/docs/latest/api/ipc-renderer#ipcrendererinvokechannel-args
+    } else {
+// TODO: log this!
     }
   }
 
@@ -42,7 +43,11 @@ export class ElectronService {
     return !!(window && window.process && window.process.type);
   }
 
+  public on(channel: Channel, listener: (...args: any[]) => void): void {
+    this._ipcRenderer?.on(channel, (_event, ...args) => listener(...args));
+  }
+
   public emitRendererEvent(event: RendererEvent, args?: any): void {
-    this.ipcRenderer?.send(Channel.RendererEvent, event, args);
+    this._ipcRenderer?.send(Channel.RendererEvent, event, args);
   }
 }

@@ -28,7 +28,7 @@ export class AppComponent {
     this._log = logService.getLogger('AppComponent');
     this._log.info('environment:', environment.name);
 
-    _electronService.ipcRenderer?.on(Channel.MenuCommand, (_event, ...args) => this.handleMenuCommand(...args));
+    _electronService.on(Channel.MenuCommand, (...args) => this.handleMenuCommand(...args));
   }
 
   public foo(): void {

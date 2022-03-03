@@ -6,6 +6,7 @@ import { BrowserWindow, BrowserWindowConstructorOptions, ipcMain, Menu, MenuItem
 
 import { ServerCredentials } from '../src/app/core/model';
 import { Channel, MenuCommand, RendererEvent } from '../src/app/enums';
+import { ElectronEvent } from './enums';
 import { RecentlyOpenedService } from './services/recently-opened.service';
 
 const DIFF_DATABASES_MENU_ID: string = 'diff-databases';
@@ -20,8 +21,8 @@ export class Application {
     this.isMac = process.platform === 'darwin';
     this._debugMode = !_electronApp.isPackaged;
 
-    _electronApp.on('activate', this.onElectronActivate);
-    _electronApp.on('window-all-closed', this.onElectronWindowAllClosed);
+    _electronApp.on(ElectronEvent.Activate, this.onElectronActivate);
+    _electronApp.on(ElectronEvent.WindowAllClosed, this.onElectronWindowAllClosed);
   }
 
   public initialize(): void {
@@ -36,14 +37,6 @@ export class Application {
       this._mainWindow = undefined;
     }
 
-    const mainWindow: BrowserWindow = new BrowserWindow({
-      webPreferences: {
-        nodeIntegration: true,
-        allowRunningInsecureContent: this._debugMode,
-        contextIsolation: false  // false if you want to run e2e test with Spectron
-      }
-    });
-
     Menu.setApplicationMenu(null);
     const menu: Menu = this.createMainMenu();
     Menu.setApplicationMenu(menu);
@@ -56,6 +49,14 @@ export class Application {
                                   const updateMenu: Menu = this.createMainMenu(recentCredentials);
                                   Menu.setApplicationMenu(updateMenu);
                                 });
+
+    const mainWindow: BrowserWindow = new BrowserWindow({
+      webPreferences: {
+        nodeIntegration: true,
+        allowRunningInsecureContent: this._debugMode,
+        contextIsolation: false  // false if you want to run e2e test with Spectron
+      }
+    });
 
     mainWindow.webContents.setWindowOpenHandler(details => {
       const options: BrowserWindowConstructorOptions = JSON.parse(details.features);
@@ -70,37 +71,15 @@ export class Application {
       };
     });
 
-    let appUrl: string;
-
-    if (this._debugMode) {
-      mainWindow.webContents.openDevTools();
-      // electronReload(__dirname, {
-      //   electron: require(path.join(__dirname, '/../node_modules/electron'))
-      // });
-
-      appUrl = 'http://localhost:4200';
-    } else {
-      let pathIndex: string = './index.html';    // Path when running electron executable
-
-      if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
-        pathIndex = '../dist/index.html';      // Path when running electron in local folder
-      }
-
-      const url: URL = new URL('file:///' + path.join(__dirname, pathIndex));
-      appUrl = url.toString();
-    }
-
-    console.log(`Running from ${appUrl}`);
-    mainWindow.loadURL(appUrl);
-
-    this._mainWindow = mainWindow;
-    this._mainWindow.on('closed', () => {
-      /* Dereference the window object, usually you would store window
-        in an array if your app supports multi windows, this is the time
-        when you should delete the corresponding element.
-      */
-      this._mainWindow = undefined;
-    });
+    const appUrl: string = this.getBrowserAppUrl();
+    console.log(`Loading from ${appUrl}`);
+    mainWindow.loadURL(appUrl)
+              .then(() => {
+                this.onMainWindowCreated(mainWindow);
+              }, (error) => {
+                console.log('rejected', error);
+// TODO: delete window
+              });
   }
 
   private createMainMenu(recentCredentials: ServerCredentials[] = []): Menu {
@@ -172,6 +151,45 @@ export class Application {
             });
 
     return template;
+  }
+
+  private getBrowserAppUrl(): string {
+    let appUrl: string;
+
+    if (this._debugMode) {
+      // electronReload(__dirname, {
+      //   electron: require(path.join(__dirname, '/../node_modules/electron'))
+      // });
+
+      appUrl = 'http://localhost:4200';
+    } else {
+      let pathIndex: string = './index.html';    // Path when running electron executable
+
+      if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
+        pathIndex = '../dist/index.html';      // Path when running electron in local folder
+      }
+
+      const url: URL = new URL('file:///' + path.join(__dirname, pathIndex));
+      appUrl = url.toString();
+    }
+
+    return appUrl;
+  }
+
+  private onMainWindowCreated(mainWindow: BrowserWindow): void {
+    mainWindow.on(ElectronEvent.Closed, () => {
+      /* Dereference the window object, usually you would store window
+        in an array if your app supports multi windows, this is the time
+        when you should delete the corresponding element.
+      */
+      this._mainWindow = undefined;
+    });
+
+    this._mainWindow = mainWindow;
+
+    if (this._debugMode) {
+      mainWindow.webContents.openDevTools();
+    }
   }
 
   private sendMenuCommand(menuCommand: MenuCommand, ...args: any[]): void {
