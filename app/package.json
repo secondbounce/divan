@@ -8,5 +8,8 @@
   },
   "main": "main.js",
   "private": true,
-  "dependencies": {}
+  "dependencies": {
+    "electron-store": "^8.0.1",
+    "rxjs": "^7.5.4"
+  }
 }

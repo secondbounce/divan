@@ -1,14 +1,15 @@
 {
+  "appId": "com.secondbounce.divan",
   "asar": false,
   "directories": {
     "output": "release/"
   },
   "files": [
     "**/*",
-    "!**/*.ts",
-    "!*.map",
+    "!**/*.{map,ts}",
     "!package.json",
-    "!package-lock.json"
+    "!package-lock.json",
+    "!**/.unused{/*}"
   ],
   "extraResources": [
     {
