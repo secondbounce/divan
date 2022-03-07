@@ -1,4 +1,3 @@
-$side-spacing: 5px;
 $panel-gap-per-side: 2px;
 
 :host {
@@ -10,7 +9,6 @@ $panel-gap-per-side: 2px;
   grid-template-rows: auto 1fr auto;
   height: 100%;
   overflow: hidden;
-  padding-inline: $side-spacing;
   width: 100%;
 }
 
@@ -41,6 +39,7 @@ section {
   overflow: hidden;
 
   &.source {
+    border-inline-start: none;
     grid-area: source-pane;
     margin-right: $panel-gap-per-side;
   }

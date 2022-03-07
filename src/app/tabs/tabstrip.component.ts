@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { TabManagerService } from '../services';
 import { TabItem } from './tab-item';
+
+const SCROLL_FACTOR: number = 0.5;
 
 // TODO: make sure that any newly-added tabs are scrolled into view
 
@@ -16,6 +18,12 @@ export class TabstripComponent {
 
   constructor(private _tabManagerService: TabManagerService) {
     this.tabItems$ = _tabManagerService.tabItems$;
+  }
+
+  @HostListener('wheel', ['$event'])
+  public onWheel($event: WheelEvent): void {
+    const container: HTMLElement = $event.currentTarget as HTMLElement;
+    container.scrollLeft += ($event.deltaY * SCROLL_FACTOR);  /* Otherwise scrolling is quite 'coarse' */
   }
 
   public onClickSwitchTo($event: Event): void {

@@ -3,20 +3,25 @@ import { forkJoin, Observable } from 'rxjs';
 
 import { Database, DESIGN_DOC_ID_PREFIX, DesignDocument } from '../core/couchdb';
 import { Logger, LogService } from '../core/logging';
-import { DiffOptions, ServerCredentials } from '../core/model';
+import { ServerCredentials } from '../core/model';
 import { DatabaseDiffOptionsComponent } from '../elements';
 import { CompareResult } from '../enums';
-import { CouchDbExportService, ModalService, ServerService } from '../services';
+import { CouchDbExportService, ModalService, ServerService, TabManagerService } from '../services';
+import { TabPanel } from '../tabs';
 import { TabPanelComponent } from '../tabs/tab-panel.component';
 import { ModalResult } from '../ui-components';
 import { getSha1HashValue, isEqualStringArrays } from '../utility';
+import { DbDiffOptions } from './db-diff-options';
+import { DocDiffOptions } from './doc-diff-options';
+import { DocumentDiffPage } from './document-diff.page';
 
 interface DocComparisonData {
   docId: string;
+  label: string;
   sourceRev: string;
   targetRev: string;
-  sourceDoc: DesignDocument | undefined;
   identical: boolean;
+  canCompare: boolean;
 }
 
 @Component({
@@ -25,7 +30,7 @@ interface DocComparisonData {
   styleUrls: ['./database-diff.page.scss'],
   changeDetection: ChangeDetectionStrategy.Default
 })
-export class DatabaseDiffPage extends TabPanelComponent<DiffOptions> implements OnInit {
+export class DatabaseDiffPage extends TabPanelComponent<DbDiffOptions> implements OnInit {
   public source: Database | undefined;
   public target: Database | undefined;
   public designDocData: DocComparisonData[] = [];
@@ -36,6 +41,7 @@ export class DatabaseDiffPage extends TabPanelComponent<DiffOptions> implements 
   constructor(private _serverService: ServerService,
               private _couchDbExportService: CouchDbExportService,
               private _modalService: ModalService,
+              private _tabManagerService: TabManagerService,
               logService: LogService) {
     super();
 
@@ -57,7 +63,7 @@ export class DatabaseDiffPage extends TabPanelComponent<DiffOptions> implements 
     }
   }
 
-  public setData(data: DiffOptions): void {
+  public setData(data: DbDiffOptions): void {
     super.setData(data);
 
     if (this.data) {
@@ -120,7 +126,7 @@ export class DatabaseDiffPage extends TabPanelComponent<DiffOptions> implements 
                       .subscribe({
                         next: (result: ModalResult) => {
                           if (result.ok) {
-                            this.setData(result.data as DiffOptions);
+                            this.setData(result.data as DbDiffOptions);
 
                             if (this.validateParams()) {
                               this.run();
@@ -139,14 +145,18 @@ export class DatabaseDiffPage extends TabPanelComponent<DiffOptions> implements 
   }
 
   public showDocumentDiff(docId: string): void {
-    if (docId.length > 0) {
-      // this._router.navigate(['/diff/doc',
-      //                        this.data.sourceAlias,
-      //                        this.data.sourceDb,
-      //                        docId,
-      //                        this.data.targetAlias,
-      //                        this.data.targetDb
-      //                       ]);
+    if (this.data && docId.length > 0) {
+      const options: DocDiffOptions = {
+        sourceAlias: this.data.sourceAlias,
+        sourceDb: this.data.sourceDb,
+        sourceDocId: docId,
+        targetAlias: this.data.targetAlias,
+        targetDb: this.data.targetDb,
+        targetDocId: docId
+      };
+
+      const tabPanel: TabPanel = new TabPanel(DocumentDiffPage, options);
+      this._tabManagerService.open(tabPanel);
     }
   }
 
@@ -214,11 +224,12 @@ export class DatabaseDiffPage extends TabPanelComponent<DiffOptions> implements 
       getSha1HashValue(this.getValueForHash(sourceDoc)),
       getSha1HashValue(this.getValueForHash(targetDoc))
     ]).subscribe(hashes => {
-        designDocData.push({ docId: this.formatDesignDocId(docId),
+        designDocData.push({ docId,
+                             label: this.formatDesignDocId(docId),
                              sourceRev: this.shortenDocRev(sourceDoc?._rev || ''),
                              targetRev: this.shortenDocRev(targetDoc?._rev || ''),
-                             sourceDoc,
-                             identical: hashes[0] === hashes[1]
+                             identical: hashes[0] === hashes[1],
+                             canCompare: (typeof(sourceDoc) !== 'undefined' && typeof(targetDoc) !== 'undefined')
                           });
     });
   }

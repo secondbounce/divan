@@ -1,16 +1,16 @@
 import { AfterViewChecked, ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { SafeHtml, Title } from '@angular/platform-browser';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { SafeHtml } from '@angular/platform-browser';
+import { ActivatedRoute } from '@angular/router';
 import { Change, diffChars, diffLines } from 'diff';
 import { forkJoin, Observable } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 import { Document } from '../core/couchdb';
 import { Logger, LogService } from '../core/logging';
 import { DatabaseCredentials, ServerCredentials } from '../core/model';
 import { ContentSanitizerService, DocumentService, ServerService } from '../services';
-import { PageComponent } from '../ui-components';
+import { TabPanelComponent } from '../tabs';
 import { convertToText, stringFormat } from '../utility';
+import { DocDiffOptions } from './doc-diff-options';
 
 const ZERO_WIDTH_SPACE: string = '\u200B';
 const DIFF_PANEL_GAP: number = 5;
@@ -37,7 +37,7 @@ interface LineDiff {
   styleUrls: ['./document-diff.page.scss'],
   changeDetection: ChangeDetectionStrategy.Default
 })
-export class DocumentDiffPage extends PageComponent implements OnInit, AfterViewChecked {
+export class DocumentDiffPage extends TabPanelComponent<DocDiffOptions> implements OnInit, AfterViewChecked {
   public sourceTitle: string = '';
   public targetTitle: string = '';
   public sourceDiffs: SafeHtml | undefined;
@@ -56,37 +56,17 @@ export class DocumentDiffPage extends PageComponent implements OnInit, AfterView
               private _serverService: ServerService,
               private _documentService: DocumentService,
               private _contentSanitizerService: ContentSanitizerService,
-              logService: LogService,
-              titleService: Title) {
-    super(titleService);
+              logService: LogService) {
+    super();
     this._log = logService.getLogger('DocumentDiffPage');
   }
 
   public ngOnInit(): void {
-    super.ngOnInit();
-
-    this._route.paramMap
-               .pipe(takeUntil(this.isBeingDestroyed$))
-               .subscribe({
-                  next: (params: ParamMap) => {
-                    const sourceAlias: string = params.get('sourceAlias') ?? '';
-                    const sourceDb: string = params.get('sourceDb') ?? '';
-                    const sourceDocId: string = params.get('sourceDocId') ?? '';
-                    const targetAlias: string = params.get('targetAlias') ?? '';
-                    const targetDb: string = params.get('targetDb') ?? '';
-                    const targetDocId: string = params.get('targetDocId') ?? sourceDocId;
-
-                    if (this.initializeParams(sourceAlias, sourceDb, sourceDocId,
-                                              targetAlias, targetDb, targetDocId)) {
-                      this.run(sourceDocId, targetDocId);
-                    } else {
+    if (this.data && this.initializeParams(this.data)) {
+      this.run(this.data.sourceDocId, this.data.targetDocId);
+    } else {
 // TODO: display error
-                    }
-                  },
-                  error: (error: any) => {
-                    this._log.warn(error);
-                  }
-                });
+    }
   }
 
   public ngAfterViewChecked(): void {
@@ -95,15 +75,26 @@ export class DocumentDiffPage extends PageComponent implements OnInit, AfterView
     }
   }
 
-  private initializeParams(sourceAlias: string, sourceDb: string, sourceDocId: string,
-                           targetAlias: string, targetDb: string, targetDocId: string): boolean {
-    const sourceCredentials: ServerCredentials | undefined = this._serverService.getServerCredentials(sourceAlias);
-    const targetCredentials: ServerCredentials | undefined = this._serverService.getServerCredentials(targetAlias);
+  public setData(data: DocDiffOptions): void {
+    super.setData(data);
+
+    if (this.data) {
+// TODO: sort out what the title should be
+      this.setTitle(`${this.data.sourceAlias} # ${this.data.sourceDb} => ${this.data.targetAlias} # ${this.data.targetDb}`);
+    } else {
+      this.setTitle('');
+    }
+  }
+
+  private initializeParams(data: DocDiffOptions): boolean {
+    const sourceCredentials: ServerCredentials | undefined = this._serverService.getServerCredentials(data.sourceAlias);
+    const targetCredentials: ServerCredentials | undefined = this._serverService.getServerCredentials(data.targetAlias);
     let valid: boolean = false;
 
-    if (sourceCredentials && targetCredentials && [sourceDb, sourceDocId, targetDb, targetDocId].every(value => value.length > 0)) {
-      this._sourceCredentials = new DatabaseCredentials(sourceCredentials, sourceDb);
-      this._targetCredentials = new DatabaseCredentials(targetCredentials, targetDb);
+    if (sourceCredentials && targetCredentials
+        && [data.sourceDb, data.sourceDocId, data.targetDb, data.targetDocId].every(value => value.length > 0)) {
+      this._sourceCredentials = new DatabaseCredentials(sourceCredentials, data.sourceDb);
+      this._targetCredentials = new DatabaseCredentials(targetCredentials, data.targetDb);
       valid = true;
     }
 
@@ -452,5 +443,4 @@ export class DocumentDiffPage extends PageComponent implements OnInit, AfterView
       targetSection.scrollTop = scroller.scrollTop;
     }
   }
-
 }

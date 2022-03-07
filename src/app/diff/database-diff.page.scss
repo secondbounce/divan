@@ -1,5 +1,18 @@
 // TODO: sort out wrapping in table
 
+table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+th:first-child {
+  width: 20%;
+}
+
+th:last-child {
+  width: 5em;
+}
+
 .level1 {
   padding-inline-start: 1em;
 }

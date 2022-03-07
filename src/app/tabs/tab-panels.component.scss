@@ -4,13 +4,11 @@
   This also means that, instead of using the `:host` pseudo-selector, we need to specify
   the component tag.
 */
-// :host {
 app-tab-panels {
   display: grid;
   grid-template-areas: "tab-panels";
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
-  padding: 18px;
 
   & > * {
     grid-area: tab-panels;

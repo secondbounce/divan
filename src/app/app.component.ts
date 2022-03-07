@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 
 import { environment } from '../environments/environment';
 import { Logger, LogService } from './core/logging';
-import { DiffOptions, Server, ServerCredentials } from './core/model';
-import { DatabaseDiffPage } from './diff';
+import { Server, ServerCredentials } from './core/model';
+import { DatabaseDiffPage, DbDiffOptions } from './diff';
 import { DatabaseDiffOptionsComponent, SelectServerComponent } from './elements';
 import { Channel, MenuCommand, RendererEvent } from './enums';
 import { ServerListComponent } from './servers';
@@ -81,7 +81,7 @@ export class AppComponent {
                       .subscribe({
                         next: (result: ModalResult) => {
                           if (result.ok) {
-                            const options: DiffOptions = result.data as DiffOptions;
+                            const options: DbDiffOptions = result.data as DbDiffOptions;
                             const tabPanel: TabPanel = new TabPanel(DatabaseDiffPage, options);
                             this._tabManagerService.open(tabPanel);
                           }

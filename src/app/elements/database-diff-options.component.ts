@@ -2,7 +2,8 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } 
 import { AbstractControl, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { map, Observable, of, takeUntil } from 'rxjs';
 
-import { DiffOptions, ServerCredentials } from '../core/model';
+import { ServerCredentials } from '../core/model';
+import { DbDiffOptions } from '../diff';
 import { ServerService } from '../services';
 import { ModalComponent } from '../ui-components';
 
@@ -24,7 +25,7 @@ export class DatabaseDiffOptionsComponent extends ModalComponent implements OnIn
   public sourceDatabaseControl: AbstractControl = new FormControl();
   public targetServerControl: AbstractControl = new FormControl();
   public targetDatabaseControl: AbstractControl = new FormControl();
-  private _options: DiffOptions = {
+  private _options: DbDiffOptions = {
     sourceAlias: '',
     sourceDb: '',
     targetAlias: '',
@@ -62,10 +63,10 @@ export class DatabaseDiffOptionsComponent extends ModalComponent implements OnIn
   }
 
   @Input()
-  public get options(): DiffOptions {
+  public get options(): DbDiffOptions {
     return this._options;
   }
-  public set options(options: DiffOptions) {
+  public set options(options: DbDiffOptions) {
     this._options = options;
 
     if (this.isFormInitialized()) {
