@@ -6,9 +6,11 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LogService } from './core/logging';
+import { DiffModule } from './diff/diff.module';
 import { ElementsModule } from './elements/elements.module';
 import { ServersModule } from './servers/servers.module';
 import { ContentSanitizerService, CouchDbExportService, CouchDbService, DocumentService, ElectronService, ModalService, ServerService } from './services';
+import { TabsModule } from './tabs/tabs.module';
 import { UiComponentsModule } from './ui-components/ui-components.module';
 
 @NgModule({
@@ -21,8 +23,10 @@ import { UiComponentsModule } from './ui-components/ui-components.module';
     HttpClientModule,
     AppRoutingModule,
     UiComponentsModule,
-    ServersModule,
-    ElementsModule
+    ElementsModule,
+    TabsModule,
+    DiffModule,
+    ServersModule
   ],
   providers: [
     ContentSanitizerService,

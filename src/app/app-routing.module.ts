@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
+// TODO: remove this module (for now, it may be useful for testing individual pages)
 const routes: Routes = [
-  { path: 'diff', loadChildren: () => import('./diff/diff.module').then(m => m.DiffModule) }
 ];
 
 @NgModule({

@@ -41,3 +41,19 @@ $form-padding:  1em;
     }
   }
 }
+
+@mixin scrollbars($size: 0.4em,
+                  $foreground-color: #999,
+                  $background-color: #dedede) {
+  &::-webkit-scrollbar {
+    width: $size;
+    height: $size;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: $foreground-color;
+  }
+  &::-webkit-scrollbar-track {
+    background: $background-color;
+  }
+  scrollbar-color: $foreground-color $background-color;
+}

@@ -1,13 +1,14 @@
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
 
 import { environment } from '../environments/environment';
 import { Logger, LogService } from './core/logging';
 import { DiffOptions, Server, ServerCredentials } from './core/model';
+import { DatabaseDiffPage } from './diff';
 import { DatabaseDiffOptionsComponent, SelectServerComponent } from './elements';
 import { Channel, MenuCommand, RendererEvent } from './enums';
 import { ServerListComponent } from './servers';
-import { ElectronService, ModalService } from './services';
+import { ElectronService, ModalService, TabManagerService } from './services';
+import { TabPanel } from './tabs/tab-panel';
 import { ModalResult } from './ui-components';
 import { convertToText } from './utility';
 
@@ -23,16 +24,12 @@ export class AppComponent {
 
   constructor(private _modalService: ModalService,
               private _electronService: ElectronService,
-              private _router: Router,
+              private _tabManagerService: TabManagerService,
               logService: LogService) {
     this._log = logService.getLogger('AppComponent');
     this._log.info('environment:', environment.name);
 
     _electronService.on(Channel.MenuCommand, (...args) => this.handleMenuCommand(...args));
-  }
-
-  public foo(): void {
-    this.handleMenuCommand(MenuCommand.OpenServer);
   }
 
   private handleMenuCommand = (...args: any[]): void => {
@@ -85,12 +82,8 @@ export class AppComponent {
                         next: (result: ModalResult) => {
                           if (result.ok) {
                             const options: DiffOptions = result.data as DiffOptions;
-                            this._router.navigate(['/diff/db',
-                                                   options.sourceAlias,
-                                                   options.sourceDb,
-                                                   options.targetAlias,
-                                                   options.targetDb
-                                                  ]);
+                            const tabPanel: TabPanel = new TabPanel(DatabaseDiffPage, options);
+                            this._tabManagerService.open(tabPanel);
                           }
                         },
                         error: (error: any) => {

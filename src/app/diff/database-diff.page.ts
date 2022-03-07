@@ -1,8 +1,5 @@
-import { Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { Title } from '@angular/platform-browser';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { forkJoin, Observable, takeUntil } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 
 import { Database, DESIGN_DOC_ID_PREFIX, DesignDocument } from '../core/couchdb';
 import { Logger, LogService } from '../core/logging';
@@ -10,7 +7,8 @@ import { DiffOptions, ServerCredentials } from '../core/model';
 import { DatabaseDiffOptionsComponent } from '../elements';
 import { CompareResult } from '../enums';
 import { CouchDbExportService, ModalService, ServerService } from '../services';
-import { ModalResult, PageComponent } from '../ui-components';
+import { TabPanelComponent } from '../tabs/tab-panel.component';
+import { ModalResult } from '../ui-components';
 import { getSha1HashValue, isEqualStringArrays } from '../utility';
 
 interface DocComparisonData {
@@ -27,13 +25,7 @@ interface DocComparisonData {
   styleUrls: ['./database-diff.page.scss'],
   changeDetection: ChangeDetectionStrategy.Default
 })
-export class DatabaseDiffPage extends PageComponent implements OnInit {
-  public diffOptions: DiffOptions = {
-    sourceAlias: '',
-    sourceDb: '',
-    targetAlias: '',
-    targetDb: ''
-  };
+export class DatabaseDiffPage extends TabPanelComponent<DiffOptions> implements OnInit {
   public source: Database | undefined;
   public target: Database | undefined;
   public designDocData: DocComparisonData[] = [];
@@ -41,56 +33,54 @@ export class DatabaseDiffPage extends PageComponent implements OnInit {
   private _targetCredentials: ServerCredentials | undefined;
   private readonly _log: Logger;
 
-  constructor(private _route: ActivatedRoute,
-              private _serverService: ServerService,
+  constructor(private _serverService: ServerService,
               private _couchDbExportService: CouchDbExportService,
               private _modalService: ModalService,
-              private _location: Location,
-              private _router: Router,
-              logService: LogService,
-              titleService: Title) {
-    super(titleService);
+              logService: LogService) {
+    super();
+
     this._log = logService.getLogger('DatabaseDiffPage');
+    this.setData({
+      sourceAlias: '',
+      sourceDb: '',
+      targetAlias: '',
+      targetDb: ''
+    });
   }
 
   public ngOnInit(): void {
-    super.ngOnInit();
-
-    this._route.paramMap
-               .pipe(takeUntil(this.isBeingDestroyed$))
-               .subscribe({
-                  next: (params: ParamMap) => {
-                    this.diffOptions.sourceAlias = params.get('sourceAlias') ?? '';
-                    this.diffOptions.sourceDb = params.get('sourceDb') ?? '';
-                    this.diffOptions.targetAlias = params.get('targetAlias') ?? '';
-                    this.diffOptions.targetDb = params.get('targetDb') ?? '';
-
-                    if (this.validateParams()) {
-                      this.run();
-                    } else {
+    if (this.validateParams()) {
+      this.run();
+    } else {
 // TODO: display error
-                      this.showOptions();
-                    }
-                  },
-                  error: (error: any) => {
-                    this._log.warn(error);
-                  }
-                });
+      this.showOptions();
+    }
+  }
+
+  public setData(data: DiffOptions): void {
+    super.setData(data);
+
+    if (this.data) {
+// TODO: sort out what the title should be
+      this.setTitle(`${this.data.sourceAlias} # ${this.data.sourceDb} => ${this.data.targetAlias} # ${this.data.targetDb}`);
+    } else {
+      this.setTitle('');
+    }
   }
 
   private validateParams(): boolean {
     let valid: boolean = true;
 
-    if (this.diffOptions.sourceAlias.length > 0 && this.diffOptions.targetAlias.length > 0) {
-      this._sourceCredentials = this._serverService.getServerCredentials(this.diffOptions.sourceAlias);
+    if (this.data && this.data.sourceAlias.length > 0 && this.data.targetAlias.length > 0) {
+      this._sourceCredentials = this._serverService.getServerCredentials(this.data.sourceAlias);
       if (typeof(this._sourceCredentials) === 'undefined') {
-        this._log.error(`No server registered for '${this.diffOptions.sourceAlias}'`);
+        this._log.error(`No server registered for '${this.data.sourceAlias}'`);
         valid = false;
       }
 
-      this._targetCredentials = this._serverService.getServerCredentials(this.diffOptions.targetAlias);
+      this._targetCredentials = this._serverService.getServerCredentials(this.data.targetAlias);
       if (typeof(this._targetCredentials) === 'undefined') {
-        this._log.error(`No server registered for '${this.diffOptions.targetAlias}'`);
+        this._log.error(`No server registered for '${this.data.targetAlias}'`);
         valid = false;
       }
     } else {
@@ -101,12 +91,12 @@ export class DatabaseDiffPage extends PageComponent implements OnInit {
   }
 
   public run(): void {
-    if (this._sourceCredentials && this._targetCredentials) {
+    if (this.data && this._sourceCredentials && this._targetCredentials) {
       const sourceDb: Observable<Database> = this._couchDbExportService.exportDatabase(this._sourceCredentials,
-                                                                                       this.diffOptions.sourceDb,
+                                                                                       this.data.sourceDb,
                                                                                        false);
       const targetDb: Observable<Database> = this._couchDbExportService.exportDatabase(this._targetCredentials,
-                                                                                       this.diffOptions.targetDb,
+                                                                                       this.data.targetDb,
                                                                                        false);
 
       forkJoin([sourceDb,
@@ -126,14 +116,13 @@ export class DatabaseDiffPage extends PageComponent implements OnInit {
 
   public showOptions(): void {
     this._modalService.show<DatabaseDiffOptionsComponent>(DatabaseDiffOptionsComponent.elementTag,
-                                                          { options: this.diffOptions })
+                                                          { options: this.data })
                       .subscribe({
                         next: (result: ModalResult) => {
                           if (result.ok) {
-                            this.diffOptions = result.data as DiffOptions;
+                            this.setData(result.data as DiffOptions);
 
                             if (this.validateParams()) {
-                              this.updateLocation();
                               this.run();
                             }
                           }
@@ -151,21 +140,14 @@ export class DatabaseDiffPage extends PageComponent implements OnInit {
 
   public showDocumentDiff(docId: string): void {
     if (docId.length > 0) {
-      this._router.navigate(['/diff/doc',
-                             this.diffOptions.sourceAlias,
-                             this.diffOptions.sourceDb,
-                             docId,
-                             this.diffOptions.targetAlias,
-                             this.diffOptions.targetDb
-                            ]);
-
-
+      // this._router.navigate(['/diff/doc',
+      //                        this.data.sourceAlias,
+      //                        this.data.sourceDb,
+      //                        docId,
+      //                        this.data.targetAlias,
+      //                        this.data.targetDb
+      //                       ]);
     }
-  }
-
-  private updateLocation(): void {
-    const path: string = `/diff/db/${encodeURIComponent(this.diffOptions.sourceAlias)}/${encodeURIComponent(this.diffOptions.sourceDb)}/${encodeURIComponent(this.diffOptions.targetAlias)}/${encodeURIComponent(this.diffOptions.targetDb)}`;
-    this._location.replaceState(path);
   }
 
   private generateDesignDocData(sourceDesignDocs: DesignDocument[], targetDesignDocs: DesignDocument[]): void {

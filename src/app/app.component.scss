@@ -2,9 +2,10 @@
 
 :host {
   display: grid;
-  grid-template-areas: "main-menu content";
+  grid-template-areas: "main-menu tabstrip"
+                       "main-menu content";
   grid-template-columns: 200px auto;
-  grid-template-rows: 1fr;
+  grid-template-rows: auto 1fr;
   height: 100vh;
 }
 
@@ -15,8 +16,10 @@ nav {
   padding: $padding-vertical $padding-horizontal;
 }
 
-main {
+app-tabstrip {
+  grid-area: tabstrip;
+}
+
+app-tab-panels {
   grid-area: content;
-  overflow: auto;
-  padding: $padding-vertical $padding-horizontal;
 }

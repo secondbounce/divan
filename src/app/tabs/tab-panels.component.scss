@@ -1,0 +1,19 @@
+/* HACK ALERT!  Styling to ensure child components fill the tabs area relies on view
+  encapsulation being set to `none`, as components are dynamically-loaded.
+
+  This also means that, instead of using the `:host` pseudo-selector, we need to specify
+  the component tag.
+*/
+// :host {
+app-tab-panels {
+  display: grid;
+  grid-template-areas: "tab-panels";
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  padding: 18px;
+
+  & > * {
+    grid-area: tab-panels;
+    background: var(--dv-form-bg);  // Needed since tab panels are loaded on top of each other
+  }
+}

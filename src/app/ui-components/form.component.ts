@@ -4,6 +4,7 @@ import { Subject } from 'rxjs';
 
 import { stringify } from '../utility';
 
+/** Implements: OnDestroy */
 @Directive()
 // eslint-disable-next-line @angular-eslint/directive-class-suffix, -- required for abstract base classes that would otherwise have to be decorated with @Component to avoid NG2007 errors
 export abstract class FormComponent implements OnDestroy {
