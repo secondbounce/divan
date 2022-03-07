@@ -99,8 +99,13 @@ export class TabManagerService extends BaseService {
       /* If we're closing the active tab, switch to the previous tab, if any, beforehand */
       if (tabItem.active) {
         this._tabItemOrder.pop();
+
         const activeKey: string = this._tabItemOrder.at(ARRAY_LAST_ITEM_INDEX) ?? '';
-        this.switchTo(activeKey);
+        const activeTabItem: TabItem | undefined = this._tabItems.get(activeKey);
+
+        if (activeTabItem) {
+          activeTabItem.active = true;
+        }
       } else {
         removeFromArray(this._tabItemOrder, key);
       }
