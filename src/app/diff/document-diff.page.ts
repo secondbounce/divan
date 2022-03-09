@@ -1,6 +1,5 @@
 import { AfterViewChecked, ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
-import { ActivatedRoute } from '@angular/router';
 import { Change, diffChars, diffLines } from 'diff';
 import { forkJoin, Observable } from 'rxjs';
 
@@ -9,7 +8,7 @@ import { Logger, LogService } from '../core/logging';
 import { DatabaseCredentials, ServerCredentials } from '../core/model';
 import { ContentSanitizerService, DocumentService, ServerService } from '../services';
 import { TabPanelComponent } from '../tabs';
-import { convertToText, stringFormat } from '../utility';
+import { convertToText } from '../utility';
 import { DocDiffOptions } from './doc-diff-options';
 
 const ZERO_WIDTH_SPACE: string = '\u200B';
@@ -52,8 +51,7 @@ export class DocumentDiffPage extends TabPanelComponent<DocDiffOptions> implemen
   private _scrollersHaveBeenSet: boolean = false;
   private readonly _log: Logger;
 
-  constructor(private _route: ActivatedRoute,
-              private _serverService: ServerService,
+  constructor(private _serverService: ServerService,
               private _documentService: DocumentService,
               private _contentSanitizerService: ContentSanitizerService,
               logService: LogService) {
@@ -78,11 +76,15 @@ export class DocumentDiffPage extends TabPanelComponent<DocDiffOptions> implemen
   public setData(data: DocDiffOptions): void {
     super.setData(data);
 
-    if (this.data) {
-// TODO: sort out what the title should be
-      this.setTitle(`${this.data.sourceAlias} # ${this.data.sourceDb} => ${this.data.targetAlias} # ${this.data.targetDb}`);
+    this.sourceTitle = `${data.sourceAlias}/${data.sourceDb}/${data.sourceDocId}`;
+    this.targetTitle = `${data.targetAlias}/${data.targetDb}/${data.targetDocId}`;
+
+    const fullTitle: string = `${this.sourceTitle} \u2022 ${this.targetTitle}`;
+
+    if (data.sourceDocId === data.targetDocId) {
+      this.setTitle(data.sourceDocId, fullTitle);
     } else {
-      this.setTitle('');
+      this.setTitle(data.sourceDocId + ' \u2022 ' + data.targetDocId, fullTitle);
     }
   }
 
@@ -103,9 +105,6 @@ export class DocumentDiffPage extends TabPanelComponent<DocDiffOptions> implemen
 
   public run(sourceDocId: string, targetDocId: string): void {
     if (this._sourceCredentials && this._targetCredentials) {
-      this.sourceTitle = stringFormat('{0} - {1}', this._sourceCredentials.serverCredentials.alias, sourceDocId);
-      this.targetTitle = stringFormat('{0} - {1}', this._targetCredentials.serverCredentials.alias, targetDocId);
-
       const sourceDoc$: Observable<Document> = this._documentService.getDocument(this._sourceCredentials, sourceDocId);
       const targetDoc$: Observable<Document> = this._documentService.getDocument(this._targetCredentials, targetDocId);
       forkJoin([sourceDoc$,
@@ -389,7 +388,7 @@ export class DocumentDiffPage extends TabPanelComponent<DocDiffOptions> implemen
     /* These will contain the changes' DIVs for each document */
     const children: HTMLCollection = container.children;
 
-    /* eslint-disable @typescript-eslint/prefer-for-of -- false positive: HTMLCollection don't have an iterator */
+    /* eslint-disable @typescript-eslint/prefer-for-of -- false positive: HTMLCollections don't have an iterator (at the moment) */
     for (let i: number = 0; i < children.length; i++) {
       const child: Element | null = children[i].firstElementChild;   /* Get the content's SPAN */
       if (child) {
@@ -406,7 +405,7 @@ export class DocumentDiffPage extends TabPanelComponent<DocDiffOptions> implemen
     const children: HTMLCollection = container.children;
     let totalHeight: number = 0;
 
-    /* eslint-disable @typescript-eslint/prefer-for-of -- false positive: HTMLCollections don't have an iterator */
+    /* eslint-disable @typescript-eslint/prefer-for-of -- false positive: HTMLCollections don't have an iterator (at the moment) */
     for (let i: number = 0; i < children.length; i++) {
       const child: Element | null = children[i];
       if (child) {

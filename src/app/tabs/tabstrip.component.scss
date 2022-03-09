@@ -1,7 +1,7 @@
 @import 'mixins';
 
 :host {
-  background: #f0f0f0;
+  background: var(--dv-tabstrip-bg);
   overflow-x: auto;
   white-space: nowrap;
 
@@ -9,20 +9,25 @@
 
   input[type="radio"] {
     appearance: none;
-    margin: 0;
+    margin: 0 1px 0 0;    /* Allow background to show through as tab separator */
 
+    &:first-child {
+      margin: 0;
+    }
     &:checked + label {
-      background-color: white;
+      background-color: var(--dv-tab-active-bg);
+      color: var(--dv-tab-active-color)
     }
   }
   label {
     align-content: center;
     align-items: center;
-    background-color: lightgray;
+    background-color: var(--dv-tab-inactive-bg);
+    color: var(--dv-tab-inactive-color);
     cursor: pointer;
     display: inline-flex;
     gap: 0.4em;
-    padding: 0.5em 0.5em 0.5em 0.85em;
+    padding: 0.4em 0.5em 0.4em 0.85em;
 
     button {
       align-items: center;

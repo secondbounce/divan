@@ -66,11 +66,12 @@ export class DatabaseDiffPage extends TabPanelComponent<DbDiffOptions> implement
   public setData(data: DbDiffOptions): void {
     super.setData(data);
 
-    if (this.data) {
-// TODO: sort out what the title should be
-      this.setTitle(`${this.data.sourceAlias} # ${this.data.sourceDb} => ${this.data.targetAlias} # ${this.data.targetDb}`);
+    const fullTitle: string = `${data.sourceAlias}/${data.sourceDb} \u2022 ${data.targetAlias}/${data.targetDb}`;
+
+    if (data.sourceDb === data.targetDb) {
+      this.setTitle(data.sourceDb, fullTitle);
     } else {
-      this.setTitle('');
+      this.setTitle(data.sourceDb + ' \u2022 ' + data.targetDb, fullTitle);
     }
   }
 

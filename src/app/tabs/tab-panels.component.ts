@@ -26,14 +26,14 @@ export class TabPanelsComponent implements OnDestroy {
     this._tabPanelHost.viewContainerRef.clear();
   }
 
-  private openTab = (tabPanel: TabPanel): Observable<string> => {
+  private openTab = (tabPanel: TabPanel): Observable<[string, string]> => {
     const viewContainerRef: ViewContainerRef = this._tabPanelHost.viewContainerRef;
 
     const componentRef: ComponentRef<TabPanelComponent<any>> = viewContainerRef.createComponent<TabPanelComponent<any>>(tabPanel.component);
     componentRef.instance.setData(tabPanel.data);
     this._viewRefs.set(tabPanel.key, componentRef.hostView);
 
-    return componentRef.instance.title$;
+    return componentRef.instance.titles$;
   };
 
   private switchToTab = (key: string): void => {

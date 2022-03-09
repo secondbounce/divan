@@ -5,30 +5,37 @@ import { FormComponent } from '../ui-components';
 
 @Directive()
 export abstract class TabPanelComponent<TData> extends FormComponent implements OnDestroy {
-  public title$: Observable<string>;
-  private _title$: ReplaySubject<string> = new ReplaySubject<string>(1);
+  public titles$: Observable<[string, string]>;
+  private _titles$: ReplaySubject<[string, string]> = new ReplaySubject<[string, string]>(1);
   private _title: string = '';
+  private _fullTitle: string = '';
   private _data: TData | undefined;
 
   constructor() {
     super();
 
-    this.title$ = this._title$.asObservable();
+    this.titles$ = this._titles$.asObservable();
   }
 
   public ngOnDestroy(): void {
     super.ngOnDestroy();
 
-    this._title$.complete();
+    this._titles$.complete();
   }
 
   public get title(): string {
     return this._title;
   }
 
-  public setTitle(title: string): void {
+  public get fullTitle(): string {
+    return this._fullTitle;
+  }
+
+  public setTitle(title: string, fullTitle: string): void {
     this._title = title;
-    this._title$.next(title);
+    this._fullTitle = fullTitle;
+
+    this._titles$.next([title, fullTitle]);
   }
 
   public get data(): TData | undefined {

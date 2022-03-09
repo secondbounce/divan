@@ -10,6 +10,12 @@
   --dv-form-border: ActiveBorder;
   --dv-form-header-bg: ActiveCaption;
 
+  --dv-tabstrip-bg: #f3f3f3;
+  --dv-tab-active-color: var(--dv-default-color);
+  --dv-tab-active-bg: #fff;
+  --dv-tab-inactive-color: var(--dv-default-color);
+  --dv-tab-inactive-bg: #ececec;
+
   --dv-diff-identical-bg: #effaf3;
   --dv-diff-identical-color: #48c774;
 // TODO: work out how to use this in SVG background (_pages.scss - 'app-document-diff .missing:background-image')

@@ -13,7 +13,7 @@ import { BaseService } from './base.service';
 })
 export class TabManagerService extends BaseService {
   public tabItems$: ReplaySubject<TabItem[]> = new ReplaySubject<TabItem[]>(1);
-  private _openTabHandler: ((tabPanel: TabPanel) => Observable<string>) | undefined;
+  private _openTabHandler: ((tabPanel: TabPanel) => Observable<[string, string]>) | undefined;
   private _switchToTabHandler: ((key: string) => void) | undefined;
   private _closeTabHandler: ((key: string) => void) | undefined;
   private _tabItems: Map<string, TabItem> = new Map<string, TabItem>();
@@ -29,7 +29,7 @@ export class TabManagerService extends BaseService {
     });
   }
 
-  public registerOpenTabHandler(handler: (tabPanel: TabPanel) => Observable<string>): void {
+  public registerOpenTabHandler(handler: (tabPanel: TabPanel) => Observable<[string, string]>): void {
     this._openTabHandler = handler;
   }
 
@@ -45,15 +45,16 @@ export class TabManagerService extends BaseService {
     const key: string = tabPanel.key;
 
     /* Need to add to map first since title change handler relies on it being available */
-    this._tabItems.set(tabPanel.key, { key: tabPanel.key, title: '', active: true});
+    this._tabItems.set(tabPanel.key, { key: tabPanel.key, title: '', fullTitle: '', active: true});
 
     if (this._openTabHandler) {
       this._openTabHandler(tabPanel).pipe(takeUntil(this.isBeingDestroyed$))
-                                    .subscribe(title => {
+                                    .subscribe(titles => {
                                       const tabItem: TabItem | undefined = this._tabItems.get(key);
 
                                       if (tabItem) {
-                                        tabItem.title = title;
+                                        tabItem.title = titles[0];
+                                        tabItem.fullTitle = titles[1];
                                         this.updateTabItemValues();
                                       }
                                     });
