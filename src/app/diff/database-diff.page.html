@@ -1,19 +1,20 @@
 <header>
+<!-- TODO: sort these out - tidy up and style properly -->
 	<button (click)="this.showOptions()">Options</button>
 	<button (click)="run()">Reload</button>
 </header>
 <table *ngIf="this.source && this.target">
 	<thead>
 		<th></th>
-		<th>{{ this.source?.name }}</th>
-		<th>{{ this.target?.name }}</th>
+		<th class="data">{{ this.source?.name }}</th>
+		<th class="data">{{ this.target?.name }}</th>
 		<th></th>
 	</thead>
 	<tbody>
 		<tr [ngClass]="{'identical': this.source?.partitioned === this.target?.partitioned}">
 			<td class="level1">partitioned</td>
-			<td>{{ this.source?.partitioned }}</td>
-			<td>{{ this.target?.partitioned }}</td>
+			<td class="data">{{ this.source?.partitioned }}</td>
+			<td class="data">{{ this.target?.partitioned }}</td>
 			<td></td>
 		</tr>
 		<tr>
@@ -30,14 +31,14 @@
 		</tr>
 		<tr [ngClass]="{'identical': areEqual(this.source?._security?.admins?.names, this.target?._security?.admins?.names)}">
 			<td class="level3">names</td>
-			<td>{{ this.source?._security?.admins?.names }}</td>
-			<td>{{ this.target?._security?.admins?.names }}</td>
+			<td class="data">{{ this.source?._security?.admins?.names }}</td>
+			<td class="data">{{ this.target?._security?.admins?.names }}</td>
 			<td></td>
 		</tr>
 		<tr [ngClass]="{'identical': areEqual(this.source?._security?.admins?.roles, this.target?._security?.admins?.roles)}">
 			<td class="level3">roles</td>
-			<td>{{ this.source?._security?.admins?.roles }}</td>
-			<td>{{ this.target?._security?.admins?.roles }}</td>
+			<td class="data">{{ this.source?._security?.admins?.roles }}</td>
+			<td class="data">{{ this.target?._security?.admins?.roles }}</td>
 			<td></td>
 		</tr>
 		<tr>
@@ -48,14 +49,14 @@
 		</tr>
 		<tr [ngClass]="{'identical': areEqual(this.source?._security?.members?.names, this.target?._security?.members?.names)}">
 			<td class="level3">names</td>
-			<td>{{ this.source?._security?.members?.names }}</td>
-			<td>{{ this.target?._security?.members?.names }}</td>
+			<td class="data">{{ this.source?._security?.members?.names }}</td>
+			<td class="data">{{ this.target?._security?.members?.names }}</td>
 			<td></td>
 		</tr>
 		<tr [ngClass]="{'identical': areEqual(this.source?._security?.members?.roles, this.target?._security?.members?.roles)}">
 			<td class="level3">roles</td>
-			<td>{{ this.source?._security?.members?.roles }}</td>
-			<td>{{ this.target?._security?.members?.roles }}</td>
+			<td class="data">{{ this.source?._security?.members?.roles }}</td>
+			<td class="data">{{ this.target?._security?.members?.roles }}</td>
 			<td></td>
 		</tr>
 		<tr>
@@ -65,9 +66,9 @@
 			<td></td>
 		</tr>
 		<tr *ngFor="let data of this.designDocData" [ngClass]="{'identical': data.identical}" (dblclick)="showDocumentDiff(data.docId)">
-			<td class="level2">{{ data.label }}</td>
-			<td class="is-family-code">{{ data.sourceRev }}</td>
-			<td class="is-family-code">{{ data.targetRev }}</td>
+			<td class="level2" [title]="data.label">{{ data.label }}</td>
+			<td class="data">{{ data.sourceRev }}</td>
+			<td class="data">{{ data.targetRev }}</td>
 			<td class="actions">
 				<button *ngIf="data.canCompare" title="Compare" (click)="showDocumentDiff(data.docId)"><img src="../../assets/icons/compare.svg" title="Compare"></button>
 			</td>

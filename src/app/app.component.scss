@@ -10,7 +10,7 @@
 }
 
 nav {
-  border-inline-end: solid 1px var(--dv-border-color-default);
+  border-inline-end: solid 1px var(--dv-default-border-color);
   grid-area: main-menu;
   overflow: auto;
   padding: $padding-vertical $padding-horizontal;

@@ -43,8 +43,8 @@ $form-padding:  1em;
 }
 
 @mixin scrollbars($size: 0.4em,
-                  $foreground-color: #999,
-                  $background-color: #dedede) {
+                  $foreground-color: var(--dv-scrollbar-thumb),
+                  $background-color: var(--dv-scrollbar-track)) {
   &::-webkit-scrollbar {
     width: $size;
     height: $size;

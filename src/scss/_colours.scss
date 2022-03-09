@@ -3,7 +3,11 @@
 */
 
 :root {
-  --dv-border-color-default: WindowFrame;
+  --dv-default-color: #4d4d4d;
+  --dv-default-border-color: WindowFrame;
+
+  --dv-scrollbar-thumb: #999;
+  --dv-scrollbar-track: #dedede;
 
   --dv-modal-overlay-bg: #0000004f;
   --dv-form-bg: Window;

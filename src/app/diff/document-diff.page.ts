@@ -28,6 +28,7 @@ interface LineDiff {
   targetState: DiffState;
 }
 
+// TODO: work out how to get header label to overflow when view width is reduced
 // TODO: display progress indicator (for deployment function only?)
 
 @Component({

@@ -1,16 +1,30 @@
-// TODO: sort out wrapping in table
-
 table {
   table-layout: fixed;
   width: 100%;
 }
 
-th:first-child {
-  width: 20%;
+th,
+td {
+  vertical-align: baseline;
+
+  &:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 20%;
+  }
 }
 
 th:last-child {
   width: 5em;
+}
+
+.data {
+  word-break: break-word;
+}
+
+td.data {
+// TODO: pick a better font?
+  font-family: monospace;
 }
 
 .level1 {
