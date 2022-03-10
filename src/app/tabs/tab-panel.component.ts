@@ -1,4 +1,4 @@
-import { Directive, OnDestroy } from '@angular/core';
+import { Directive, HostBinding, OnDestroy } from '@angular/core';
 import { Observable, ReplaySubject } from 'rxjs';
 
 import { FormComponent } from '../ui-components';
@@ -6,6 +6,7 @@ import { FormComponent } from '../ui-components';
 @Directive()
 export abstract class TabPanelComponent<TData> extends FormComponent implements OnDestroy {
   public titles$: Observable<[string, string]>;
+  public active: boolean = false;
   private _titles$: ReplaySubject<[string, string]> = new ReplaySubject<[string, string]>(1);
   private _title: string = '';
   private _fullTitle: string = '';
@@ -21,6 +22,15 @@ export abstract class TabPanelComponent<TData> extends FormComponent implements 
     super.ngOnDestroy();
 
     this._titles$.complete();
+  }
+
+  /**
+   * We want to flag *inactive* tabs with the class name, so need a property that inverts
+   * the 'real' property (hence this one is private).
+   */
+  @HostBinding('class.inactive-tab')
+  private get inactive(): boolean {
+    return !this.active;
   }
 
   public get title(): string {

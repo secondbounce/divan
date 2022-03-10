@@ -9,9 +9,11 @@ app-tab-panels {
   grid-template-areas: "tab-panels";
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
+  overflow: hidden;   // Needed to stop panel covering tabstrip when height is too small
 
   & > * {
-    grid-area: tab-panels;
     background: var(--dv-form-bg);  // Needed since tab panels are loaded on top of each other
+    grid-area: tab-panels;
+    overflow: auto;
   }
 }

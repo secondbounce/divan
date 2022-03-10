@@ -2,6 +2,7 @@
 
 :host {
   background: var(--dv-tabstrip-bg);
+  border-top: solid 1px var(--dv-tabstrip-bg);
   overflow-x: auto;
   white-space: nowrap;
 

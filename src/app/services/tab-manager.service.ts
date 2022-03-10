@@ -106,6 +106,9 @@ export class TabManagerService extends BaseService {
 
         if (activeTabItem) {
           activeTabItem.active = true;
+          if (this._switchToTabHandler) {
+            this._switchToTabHandler(activeTabItem.key);
+          }
         }
       } else {
         removeFromArray(this._tabItemOrder, key);

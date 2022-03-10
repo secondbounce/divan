@@ -19,3 +19,7 @@ button {
     max-height: 1em;
   }
 }
+
+.inactive-tab {
+  z-index: -1;
+}

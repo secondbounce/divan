@@ -14,7 +14,7 @@ import { TabPanelsDirective } from './tab-panels.directive';
 })
 export class TabPanelsComponent implements OnDestroy {
   @ViewChild(TabPanelsDirective, {static: true}) private _tabPanelHost!: TabPanelsDirective;
-  private _viewRefs: Map<string, ViewRef> = new Map<string, ViewRef>();
+  private _componentRefs: Map<string, ComponentRef<TabPanelComponent<any>>> = new Map<string, ComponentRef<TabPanelComponent<any>>>();
 
   constructor(private _tabManagerService: TabManagerService) {
     _tabManagerService.registerOpenTabHandler(this.openTab);
@@ -31,35 +31,38 @@ export class TabPanelsComponent implements OnDestroy {
 
     const componentRef: ComponentRef<TabPanelComponent<any>> = viewContainerRef.createComponent<TabPanelComponent<any>>(tabPanel.component);
     componentRef.instance.setData(tabPanel.data);
-    this._viewRefs.set(tabPanel.key, componentRef.hostView);
+    this._componentRefs.set(tabPanel.key, componentRef);
+    this.markActiveTab(tabPanel.key);
 
     return componentRef.instance.titles$;
   };
 
   private switchToTab = (key: string): void => {
-    const viewRef: ViewRef | undefined = this._viewRefs.get(key);
+    const componentRef: ComponentRef<TabPanelComponent<any>> | undefined = this._componentRefs.get(key);
 
-    if (viewRef) {
-      const viewContainerRef: ViewContainerRef = this._tabPanelHost.viewContainerRef;
-      const index: number = viewContainerRef.indexOf(viewRef);
-
-      if (index >= 0) {
-        viewContainerRef.move(viewRef, viewContainerRef.length - 1);
-      }
+    if (componentRef) {
+      this.markActiveTab(key);
     }
   };
 
   private closeTab = (key: string): void => {
-    const viewRef: ViewRef | undefined = this._viewRefs.get(key);
+    const componentRef: ComponentRef<TabPanelComponent<any>> | undefined = this._componentRefs.get(key);
 
-    if (viewRef) {
+    if (componentRef) {
+      const viewRef: ViewRef = componentRef.hostView;
       const viewContainerRef: ViewContainerRef = this._tabPanelHost.viewContainerRef;
       const index: number = viewContainerRef.indexOf(viewRef);
 
       if (index >= 0) {
         viewContainerRef.remove(index);
       }
-      this._viewRefs.delete(key);
+      this._componentRefs.delete(key);
     }
   };
+
+  private markActiveTab(activeKey: string): void {
+    for (const [key, componentRef] of this._componentRefs) {
+      componentRef.instance.active = (key === activeKey);
+    }
+  }
 }
