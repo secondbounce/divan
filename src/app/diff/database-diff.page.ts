@@ -6,11 +6,11 @@ import { Logger, LogService } from '../core/logging';
 import { ServerCredentials } from '../core/model';
 import { DatabaseDiffOptionsComponent } from '../elements';
 import { CompareResult } from '../enums';
-import { CouchDbExportService, ModalService, ServerService, TabManagerService } from '../services';
+import { CouchDbExportService, DocumentService, ModalService, ServerService, TabManagerService } from '../services';
 import { TabPanel } from '../tabs';
 import { TabPanelComponent } from '../tabs/tab-panel.component';
 import { ModalResult } from '../ui-components';
-import { getSha1HashValue, isEqualStringArrays } from '../utility';
+import { isEqualStringArrays } from '../utility';
 import { DbDiffOptions } from './db-diff-options';
 import { DocDiffOptions } from './doc-diff-options';
 import { DocumentDiffPage } from './document-diff.page';
@@ -40,6 +40,7 @@ export class DatabaseDiffPage extends TabPanelComponent<DbDiffOptions> implement
 
   constructor(private _serverService: ServerService,
               private _couchDbExportService: CouchDbExportService,
+              private _documentService: DocumentService,
               private _modalService: ModalService,
               private _tabManagerService: TabManagerService,
               logService: LogService) {
@@ -221,26 +222,16 @@ export class DatabaseDiffPage extends TabPanelComponent<DbDiffOptions> implement
       - and should therefore be the same for docs with identical contents, this isn't always
       the case exactly.  So for comparison purposes, we'll calculate the SHA-1 hash instead.
     */
-    forkJoin([
-      getSha1HashValue(this.getValueForHash(sourceDoc)),
-      getSha1HashValue(this.getValueForHash(targetDoc))
-    ]).subscribe(hashes => {
-        designDocData.push({ docId,
-                             label: this.formatDesignDocId(docId),
-                             sourceRev: this.shortenDocRev(sourceDoc?._rev || ''),
-                             targetRev: this.shortenDocRev(targetDoc?._rev || ''),
-                             identical: hashes[0] === hashes[1],
-                             canCompare: (typeof(sourceDoc) !== 'undefined' && typeof(targetDoc) !== 'undefined')
-                          });
-    });
-  }
+    const sourceHash: string = this._documentService.getDocumentHashValue(sourceDoc);
+    const targetHash: string = this._documentService.getDocumentHashValue(targetDoc);
 
-  private getValueForHash(doc: DesignDocument | undefined): string {
-    return doc ? JSON.stringify({ ...doc,
-                                  _id: undefined,
-                                  _rev: undefined
-                                })
-               : '';
+    designDocData.push({ docId,
+                         label: this.formatDesignDocId(docId),
+                         sourceRev: this.shortenDocRev(sourceDoc?._rev || ''),
+                         targetRev: this.shortenDocRev(targetDoc?._rev || ''),
+                         identical: sourceHash === targetHash,
+                         canCompare: (typeof(sourceDoc) !== 'undefined' && typeof(targetDoc) !== 'undefined')
+                      });
   }
 
   private formatDesignDocId(id: string): string {

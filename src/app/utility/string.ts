@@ -1,3 +1,5 @@
+import * as crypto from 'crypto';
+
 import { JSON_STRINGIFY_SPACES } from '../constants';
 
 /**
@@ -137,18 +139,13 @@ export function stringFormat(format: string, ...args: any[] ): string {
                .replace('\\{', '{');
 }
 
-export async function getSha1HashValue(source: string): Promise<string> {
+export function getSha1HashValue(source: string): string {
   let hash: string = '';
 
   if (source.length > 0) {
-    const uint8Data: Uint8Array = new TextEncoder().encode(source);
-    const hashBuffer: ArrayBuffer = await crypto.subtle.digest('SHA-1', uint8Data);
-    const hashArray: number[] = Array.from(new Uint8Array(hashBuffer));
-
-    /* eslint-disable @typescript-eslint/no-magic-numbers */
-    hash = hashArray.map(b => b.toString(16)
-                               .padStart(2, '0'))
-                               .join('');
+    hash = crypto.createHash('sha1')
+                 .update(source)
+                 .digest('hex');
   }
 
   return hash;
