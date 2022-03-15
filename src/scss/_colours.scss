@@ -5,14 +5,16 @@
 :root {
   --dv-default-color: #4d4d4d;
   --dv-default-border-color: WindowFrame;
+  --dv-default-invalid: #da0000;
 
   --dv-scrollbar-thumb: #999;
   --dv-scrollbar-track: #dedede;
 
-  --dv-modal-overlay-bg: #0000004f;
+  --dv-modal-overlay-bg: #00000020;
   --dv-form-bg: Window;
   --dv-form-border: ActiveBorder;
   --dv-form-header-bg: ActiveCaption;
+  --dv-control-border: #a5a5a5;
 
   --dv-tabstrip-bg: #f3f3f3;
   --dv-tab-active-color: var(--dv-default-color);

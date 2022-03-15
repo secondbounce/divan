@@ -1,4 +1,4 @@
-$form-padding:  1em;
+@import "variables";
 
 %modal {
   display: flex;
@@ -11,6 +11,7 @@ $form-padding:  1em;
   height: 100%;
 
   .background {
+    animation: $animation-duration-fast fade-in both;
     background-color: var(--dv-modal-overlay-bg);
     position: absolute;
     top: 0;
@@ -21,7 +22,8 @@ $form-padding:  1em;
   }
 
   form {
-    background-color: var(--dv-form-bg);
+    animation: $animation-duration fade-in $animation-delay both,    /* Add an animation delay equal to the overlay animation duration to */
+               $animation-duration slide-up $animation-delay both;   /* wait for the overlay to appear before animation in the dialog */
     border: 1px solid var(--dv-form-border);
     padding: 0 $form-padding $form-padding;
     z-index: 2;
@@ -31,13 +33,26 @@ $form-padding:  1em;
       background-color: var(--dv-form-header-bg);
       content: attr(aria-label);
       display: block;
+      grid-column: 1 / 3;
       line-height: 1;
-      margin: 0 (-1 * $form-padding) $form-padding;
+      margin: 0 (-1 * $form-padding) $control-padding;
       padding: 0.5em;
     }
+  }
 
-    footer {
-      padding-top: $form-padding;
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes slide-up {
+    from {
+      transform: translateY(10%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    form {
+      animation: none;
     }
   }
 }

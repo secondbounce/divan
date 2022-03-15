@@ -1,5 +1,6 @@
-import { Directive, EventEmitter, Output } from '@angular/core';
+import { Directive, EventEmitter, HostBinding, HostListener, Output } from '@angular/core';
 
+import { AriaRole } from '../enums';
 import { FormComponent } from './form.component';
 
 export interface ModalResult {
@@ -12,6 +13,21 @@ export interface ModalResult {
 export abstract class ModalComponent extends FormComponent {
   // @HostBinding('@state') public state: 'opened' | 'closed' = 'closed';
   @Output() public closed = new EventEmitter<ModalResult>();
+  @HostBinding('attr.role') public role: AriaRole = AriaRole.Dialog;
+// TODO: should default to true if/when open/close methods are implemented (otherwise just remove)
+  @HostBinding('attr.aria-hidden') protected _hidden: boolean = false;
+  @HostBinding('attr.aria-modal') protected readonly _modal: boolean = true;  /* Never changed, just adds attribute to host element */
+  @HostBinding('tabindex') protected readonly _tabindex: number = -1;  /* Never changed, just adds attribute to host element */
+
+  @HostListener('window:keydown.esc', ['$event'])
+  protected onEscKeyDown($event: KeyboardEvent): void {
+    if (!this._hidden && this.role !== AriaRole.AlertDialog) {
+      $event.preventDefault();
+// TODO: should we have show/hide methods too?
+      // this.hide();
+      this.cancel();
+    }
+  }
 
   protected ok(data?: any): void {
     this.closed.next({ ok: true, data });

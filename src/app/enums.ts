@@ -1,3 +1,8 @@
+export const enum AriaRole {
+  AlertDialog = 'alertdialog',
+  Dialog = 'dialog'
+}
+
 export const enum Channel {
   MenuCommand = 'menu-command',
   RendererEvent = 'renderer-event'
