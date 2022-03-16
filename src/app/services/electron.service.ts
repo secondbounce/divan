@@ -5,7 +5,9 @@ import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import { Injectable } from '@angular/core';
 import { ipcRenderer, webFrame } from 'electron';
+
 import { Channel, RendererEvent } from '../enums';
+import { isElectron } from '../utility';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +19,7 @@ export class ElectronService {
   private readonly _ipcRenderer?: typeof ipcRenderer;
 
   constructor() {
-    if (this.isElectron) {
+    if (isElectron()) {
       this._ipcRenderer = window.require('electron').ipcRenderer;
       this.webFrame = window.require('electron').webFrame;
       this.childProcess = window.require('child_process');
@@ -37,10 +39,6 @@ export class ElectronService {
     } else {
 // TODO: log this!
     }
-  }
-
-  public get isElectron(): boolean {
-    return !!(window && window.process && window.process.type);
   }
 
   public on(channel: Channel, listener: (...args: any[]) => void): void {

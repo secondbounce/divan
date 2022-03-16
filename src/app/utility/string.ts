@@ -37,11 +37,20 @@ function convertObjectToText(obj: any, indent: number = 0): string {
     return text.length === 0 ? '[]'
                              : '[\n' + nextIndent + text.join(',\n' + nextIndent) + '\n' + thisIndent + ']';
   } else if (typeof(obj) === 'function') {
+    /* We don't really want to output functions, but if one is explicitly passed to this
+      method, we'll output it anyway.
+    */
     text.push(obj.toString());
 
   } else if (typeof(obj) === 'object') {
     Object.getOwnPropertyNames(obj)
-          .forEach((property) => text.push(property + ': ' + convertObjectToText(obj[property], indent)));
+          .forEach((property) => {
+            const value: any = obj[property];
+
+            if (typeof(value) !== 'function') {
+              text.push(property + ': ' + convertObjectToText(value, indent));
+            }
+          });
 
     return text.length === 0 ? '{}'
                              : '{\n' + nextIndent + text.join(',\n' + nextIndent) + '\n' + thisIndent + '}';

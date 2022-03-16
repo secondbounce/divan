@@ -1,14 +1,25 @@
 {
   "name": "divan",
+  "productName": "Divan",
   "version": "0.0.0",
   "description": "Database administration for CouchDB",
+  "homepage": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/secondbounce/divan.git"
+  },
   "author": {
     "name": "David Geary",
     "email": "david@secondbounce.com"
   },
-  "main": "main.js",
+  "license": "MIT",
+  "keywords": [
+    "couchdb"
+  ],
+  "main": "app/main.js",
   "private": true,
   "dependencies": {
+    "electron-log": "^4.4.6",
     "electron-store": "^8.0.1",
     "rxjs": "^7.5.4"
   }

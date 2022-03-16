@@ -1,12 +1,16 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { BrowserWindow, BrowserWindowConstructorOptions, ipcMain, Menu, MenuItemConstructorOptions } from 'electron';
+import log from 'electron-log';
 // TODO: currently getting "Could not find a declaration file for module 'electron-reload'" even though it supposedly supports typings
 // import electronReload from 'electron-reload';
 
 import { ServerCredentials } from '../src/app/core/model';
 import { Channel, MenuCommand, RendererEvent } from '../src/app/enums';
+import { convertToText } from '../src/app/utility';
 import { ElectronEvent } from './enums';
+import { configureLogging } from './log-config';
+import { Logger } from './logger';
 import { RecentlyOpenedService } from './services/recently-opened.service';
 
 const DIFF_DATABASES_MENU_ID: string = 'diff-databases';
@@ -16,8 +20,12 @@ export class Application {
   private _mainWindow: BrowserWindow | undefined;
   private _recentlyOpenedService: RecentlyOpenedService = RecentlyOpenedService.instance;
   private _debugMode: boolean;
+  private readonly _log: Logger;
 
   constructor(private _electronApp: Electron.App) {
+    configureLogging(log);
+
+    this._log = new Logger('Application');
     this.isMac = process.platform === 'darwin';
     this._debugMode = !_electronApp.isPackaged;
 
@@ -72,13 +80,15 @@ export class Application {
     });
 
     const appUrl: string = this.getBrowserAppUrl();
-    console.log(`Loading from ${appUrl}`);
+    this._log.info(`Loading from ${appUrl}`);
     mainWindow.loadURL(appUrl)
               .then(() => {
                 this.onMainWindowCreated(mainWindow);
               }, (error) => {
-                console.log('rejected', error);
-// TODO: delete window
+                this._log.error(`Failed to load ${appUrl} into main window`, error);
+// TODO: need to display the error message somehow
+// TODO: delete window?
+                // mainWindow.destroy();
               });
   }
 
@@ -207,13 +217,14 @@ export class Application {
         if (credentials) {
           this.onServerOpened(credentials);
         } else {
-// TODO: log the error
+          this._log.error('\'ServerOpened\' renderer event received without credentials');
+// TODO: need to display the error message somehow
         }
         break;
       }
       default:
-// TODO: log the error
-        // this._log.error(`Unsupported MenuCommand - ${convertToText(mainCommand)}`);
+        this._log.error(`Unsupported RendererEvent - ${convertToText(args)}`);
+// TODO: need to display the error message somehow
         break;
     }
   };
