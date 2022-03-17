@@ -4,11 +4,11 @@ import { Change, diffChars, diffLines } from 'diff';
 import { forkJoin, Observable } from 'rxjs';
 
 import { Document } from '../core/couchdb';
+import { convertToText } from '~shared/string';
 import { Logger, LogService } from '../core/logging';
 import { DatabaseCredentials, ServerCredentials } from '../core/model';
 import { ContentSanitizerService, DocumentService, ServerService } from '../services';
 import { TabPanelComponent } from '../tabs';
-import { convertToText } from '../utility';
 import { DocDiffOptions } from './doc-diff-options';
 
 const ZERO_WIDTH_SPACE: string = '\u200B';

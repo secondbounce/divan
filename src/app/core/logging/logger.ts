@@ -1,4 +1,4 @@
-import { LoggerCore, LoggerFunctions } from '../../../../app/logger-core';
+import { LoggerCore, LoggerFunctions } from '~shared/logger-core';
 import { isElectron } from '../../utility';
 
 export class Logger extends LoggerCore {

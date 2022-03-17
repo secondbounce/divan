@@ -16,7 +16,7 @@
   "keywords": [
     "couchdb"
   ],
-  "main": "app/main.js",
+  "main": "main.js",
   "private": true,
   "dependencies": {
     "electron-log": "^4.4.6",

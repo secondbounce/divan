@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 
+import { convertToText } from '~shared/string';
 import { environment } from '../environments/environment';
 import { Logger, LogService } from './core/logging';
 import { Server, ServerCredentials } from './core/model';
@@ -10,7 +11,6 @@ import { ServerListComponent } from './servers';
 import { ElectronService, ModalService, TabManagerService } from './services';
 import { TabPanel } from './tabs/tab-panel';
 import { ModalResult } from './ui-components';
-import { convertToText } from './utility';
 
 @Component({
   selector: 'app-root',

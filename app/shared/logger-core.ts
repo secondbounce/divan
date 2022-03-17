@@ -1,4 +1,4 @@
-import { convertToText } from '../src/app/utility';
+import { convertToText } from './string';
 
 /**
  * Common interface supported by both ElectronLog and console, so we can ignore the

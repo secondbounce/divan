@@ -1,6 +1,6 @@
 import log from 'electron-log';
 
-import { LoggerCore } from './logger-core';
+import { LoggerCore } from './shared/logger-core';
 
 export class Logger extends LoggerCore {
   constructor(name: string) {

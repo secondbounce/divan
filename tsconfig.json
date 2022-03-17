@@ -2,6 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "allowJs": true,
+    "baseUrl": ".",
     "declaration": false,
     "downlevelIteration": true,    // Required to avoid "Type 'IterableIterator<...>' is not an array type or a string type" for Map.values()
     "emitDecoratorMetadata": true,
@@ -15,6 +16,9 @@
     "module": "es2020",
     "moduleResolution": "node",
     "outDir": "./dist/out-tsc",
+    "paths": {
+      "~shared/*": ["app/shared/*"]
+    },
     "sourceMap": true,
     "strict": true,
     "target": "es5",

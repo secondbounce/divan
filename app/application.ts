@@ -7,11 +7,11 @@ import log from 'electron-log';
 
 import { ServerCredentials } from '../src/app/core/model';
 import { Channel, MenuCommand, RendererEvent } from '../src/app/enums';
-import { convertToText } from '../src/app/utility';
 import { ElectronEvent } from './enums';
-import { configureLogging } from './log-config';
 import { Logger } from './logger';
 import { RecentlyOpenedService } from './services/recently-opened.service';
+import { configureLogging } from './shared/log-config';
+import { convertToText } from './shared/string';
 
 const DIFF_DATABASES_MENU_ID: string = 'diff-databases';
 

@@ -161,6 +161,14 @@
             "allowSingleLine": true
           }
         ],
+        "import/no-unresolved": [
+          "warn",
+          {
+            "ignore": [
+              "^~shared/"
+            ]
+          }
+        ],
         "import/order": [
           "warn",
           {
@@ -172,6 +180,13 @@
               "builtin",
               "external",
               "internal"
+            ],
+            "pathGroups": [
+              {
+                "pattern": "~shared/**",
+                "group": "internal",
+                "position": "before"
+              }
             ]
           }
         ],
