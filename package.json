@@ -38,6 +38,7 @@
     "lint": "ng lint --cache"
   },
   "dependencies": {
+    "@angular/animations": "~13.2.5",
     "@angular/common": "~13.2.5",
     "@angular/compiler": "~13.2.5",
     "@angular/core": "~13.2.5",
@@ -50,6 +51,7 @@
     "diff": "^5.0.0",
     "electron-log": "~4.4.6",
     "electron-store": "~8.0.1",
+    "ngx-toastr": "~14.2.2",
     "rxjs": "~7.5.4",
     "tslib": "^2.1.0",
     "zone.js": "~0.11.5"

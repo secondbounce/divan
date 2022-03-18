@@ -8,7 +8,7 @@ import { DatabaseDiffPage, DbDiffOptions } from './diff';
 import { DatabaseDiffOptionsComponent, SelectServerComponent } from './elements';
 import { Channel, MenuCommand, RendererEvent } from './enums';
 import { ServerListComponent } from './servers';
-import { ElectronService, ModalService, TabManagerService } from './services';
+import { ElectronService, ModalService, TabManagerService, ToastService } from './services';
 import { TabPanel } from './tabs/tab-panel';
 import { ModalResult } from './ui-components';
 
@@ -25,6 +25,7 @@ export class AppComponent {
   constructor(private _modalService: ModalService,
               private _electronService: ElectronService,
               private _tabManagerService: TabManagerService,
+              private _toastService: ToastService,
               logService: LogService) {
     this._log = logService.getLogger('AppComponent');
     this._log.info('environment: ' + environment.name);
@@ -52,7 +53,6 @@ export class AppComponent {
   };
 
   private openServer(credentials: ServerCredentials | undefined): void {
-// TODO: if all properties (inc. password) are set, how about just opening it, without displaying modal?
     this._modalService.show<SelectServerComponent>(SelectServerComponent.elementTag,
                                                    { credentials })
                       .subscribe({
@@ -72,6 +72,7 @@ export class AppComponent {
                         },
                         error: (error: any) => {
                           this._log.warn(error);
+                          this._toastService.showError('Unable to display Select Server dialog.\n\n(See logs for error details.)');
                         }
                       });
   }
@@ -88,6 +89,7 @@ export class AppComponent {
                         },
                         error: (error: any) => {
                           this._log.warn(error);
+                          this._toastService.showError('Unable to display Database Diff options dialog.\n\n(See logs for error details.)');
                         }
                       });
   }

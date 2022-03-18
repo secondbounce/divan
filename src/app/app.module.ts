@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ApplicationRef, DoBootstrap, Injector, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ngx-toastr';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -9,7 +11,7 @@ import { LogService } from './core/logging';
 import { DiffModule } from './diff/diff.module';
 import { ElementsModule } from './elements/elements.module';
 import { ServersModule } from './servers/servers.module';
-import { ContentSanitizerService, CouchDbExportService, CouchDbService, DocumentService, ElectronService, ModalService, ServerService } from './services';
+import { ContentSanitizerService, CouchDbExportService, CouchDbService, DocumentService, ElectronService, ModalService, ServerService, ToastService } from './services';
 import { TabsModule } from './tabs/tabs.module';
 import { UiComponentsModule } from './ui-components/ui-components.module';
 
@@ -21,6 +23,8 @@ import { UiComponentsModule } from './ui-components/ui-components.module';
     CommonModule,
     BrowserModule,
     HttpClientModule,
+    BrowserAnimationsModule,  // Required for ToastrModule
+    ToastrModule.forRoot(ToastService.globalConfig),
     AppRoutingModule,
     UiComponentsModule,
     ElementsModule,
@@ -36,7 +40,8 @@ import { UiComponentsModule } from './ui-components/ui-components.module';
     ElectronService,
     LogService,
     ModalService,
-    ServerService
+    ServerService,
+    ToastService
   ],
   bootstrap: [/* See below */]
 })

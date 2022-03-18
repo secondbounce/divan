@@ -18,6 +18,9 @@
 	<p *ngIf="this.passwordControl.invalid && (this.passwordControl.dirty || this.passwordControl.touched)" class="form-validation">
 		<ng-template [ngIf]="this.passwordControl.errors?.required">Please enter the password</ng-template>
 	</p>
+	<p *ngIf="this.errorMessage" class="form-validation">
+		{{ this.errorMessage }}
+	</p>
 	<footer>
 		<button type="submit">Open</button>
 		<button type="button" (click)="onClickCancel()">Cancel</button>

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { Logger, LogService } from '../core/logging';
 import { Server } from '../core/model';
-import { ServerService } from '../services';
+import { ServerService, ToastService } from '../services';
 
 @Component({
   selector: 'app-server-list',
@@ -15,6 +15,7 @@ export class ServerListComponent {
   private readonly _log: Logger;
 
   constructor(private _serverService: ServerService,
+              private _toastService: ToastService,
               logService: LogService) {
     this._log = logService.getLogger('AppComponent');
   }
@@ -34,7 +35,7 @@ export class ServerListComponent {
                             },
                             error: (error: any) => {
                               this._log.error(`Unable to get databases for ${server.address}`, error);
-// TODO: display warning to user
+                              this._toastService.showError(`Unable to get databases for ${server.address}\n\n(See logs for error details.)`);
                             }
                           });
     }

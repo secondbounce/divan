@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, Validators } from '@angular/forms';
-import { map, Observable, of, takeUntil } from 'rxjs';
+import { catchError, map, Observable, of, takeUntil } from 'rxjs';
 
+import { Logger, LogService } from '../core/logging';
 import { ServerCredentials } from '../core/model';
 import { DbDiffOptions } from '../diff';
-import { ServerService } from '../services';
+import { ServerService, ToastService } from '../services';
 import { ModalComponent } from '../ui-components';
 
 // TODO: if no available servers, should display 'empty state' warning and close the form
@@ -31,16 +32,25 @@ export class DatabaseDiffOptionsComponent extends ModalComponent implements OnIn
     targetAlias: '',
     targetDb: ''
   };
+  private readonly _log: Logger;
 
   constructor(private _serverService: ServerService,
               private _formBuilder: FormBuilder,
-              private _cdRef: ChangeDetectorRef) {
+              private _toastService: ToastService,
+              private _cdRef: ChangeDetectorRef,
+              logService: LogService) {
     super();
 
+    this._log = logService.getLogger('DatabaseDiffOptionsComponent');
     _serverService.serverAliases$.pipe(takeUntil(this.isBeingDestroyed$))
-                                 .subscribe((servers) => {
-                                    this.availableServers = servers;
-                                    this._cdRef.markForCheck();
+                                 .subscribe({
+                                    next: (servers) => {
+                                      this.availableServers = servers;
+                                      this._cdRef.markForCheck();
+                                    },
+                                    error: (error) => {
+                                      _toastService.showError('Error loading available servers:', error);
+                                    }
                                   });
   }
 
@@ -133,6 +143,11 @@ export class DatabaseDiffOptionsComponent extends ModalComponent implements OnIn
                                         databases.push(...databaseNames);
                                         this._cdRef.markForCheck();
                                         return credentials.alias;
+                                      }),
+                                      catchError(error => {
+                                        this._log.error(`Error retrieving databases for ${credentials.alias}`, error);
+                                        this._toastService.showError(`Error retrieving databases for ${credentials.alias}\n\n(See logs for error details.)`);
+                                        return '';
                                       }));
     } else {
       return of('');

@@ -6,3 +6,4 @@ export * from './electron.service';
 export * from './modal.service';
 export * from './server.service';
 export * from './tab-manager.service';
+export * from './toast.service';

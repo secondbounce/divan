@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, Validators } from '@angular/forms';
 
 import { Logger, LogService } from '../core/logging';
 import { ServerCredentials } from '../core/model';
-import { ServerService } from '../services';
+import { ServerService, ToastService } from '../services';
 import { ModalComponent } from '../ui-components';
 
 @Component({
@@ -14,6 +15,7 @@ import { ModalComponent } from '../ui-components';
 })
 export class SelectServerComponent extends ModalComponent implements OnInit {
   public static readonly elementTag: string = 'select-server-element';
+  public errorMessage: string = '';
   private _credentials: ServerCredentials = new ServerCredentials();
   /* Properties to expose controls requiring validation */
   public addressControl: AbstractControl = new FormControl();
@@ -23,6 +25,8 @@ export class SelectServerComponent extends ModalComponent implements OnInit {
 
   constructor(private _serverService: ServerService,
               private _formBuilder: FormBuilder,
+              private _toastService: ToastService,
+              private _cdRef: ChangeDetectorRef,
               logService: LogService) {
     super();
     this._log = logService.getLogger('SelectServerComponent');
@@ -106,14 +110,35 @@ export class SelectServerComponent extends ModalComponent implements OnInit {
                               },
                               error: (error) => {
                                 this._log.error(`Unable to get server for ${credentials.address}`, error);
-// TODO: display some sort of error message
+                                if (error instanceof HttpErrorResponse) {
+                                  this.handleHttpErrors(error);
+                                } else {
+                                  this._toastService.showWarning('Unable to access server:', error);
+                                }
                               }
                             });
       }
+    } else {
+      this.errorMessage = '';
     }
   }
 
   public onClickCancel(): void {
     this.cancel();
+  }
+
+  private handleHttpErrors(response: HttpErrorResponse): void {
+    switch (response.status) {
+      case HttpStatusCode.Unauthorized:
+        this.errorMessage = 'Name or password is incorrect';
+        break;
+
+      case 0:
+      default:
+        this.errorMessage = 'Unable to connect to server: "' + response.message + '"';
+        break;
+    }
+
+    this._cdRef.markForCheck();
   }
 }

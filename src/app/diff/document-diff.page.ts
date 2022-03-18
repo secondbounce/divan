@@ -7,7 +7,7 @@ import { Document } from '../core/couchdb';
 import { convertToText } from '~shared/string';
 import { Logger, LogService } from '../core/logging';
 import { DatabaseCredentials, ServerCredentials } from '../core/model';
-import { ContentSanitizerService, DocumentService, ServerService } from '../services';
+import { ContentSanitizerService, DocumentService, ServerService, ToastService } from '../services';
 import { TabPanelComponent } from '../tabs';
 import { DocDiffOptions } from './doc-diff-options';
 
@@ -55,6 +55,7 @@ export class DocumentDiffPage extends TabPanelComponent<DocDiffOptions> implemen
   constructor(private _serverService: ServerService,
               private _documentService: DocumentService,
               private _contentSanitizerService: ContentSanitizerService,
+              private _toastService: ToastService,
               logService: LogService) {
     super();
     this._log = logService.getLogger('DocumentDiffPage');
@@ -64,7 +65,8 @@ export class DocumentDiffPage extends TabPanelComponent<DocDiffOptions> implemen
     if (this.data && this.initializeParams(this.data)) {
       this.run(this.data.sourceDocId, this.data.targetDocId);
     } else {
-// TODO: display error
+      this._log.warn('Invalid/missing parameters for document diff', this.data);
+      this._toastService.showError('The parameters passed for this diff are missing/invalid.\n\n(See logs for error details.)');
     }
   }
 
@@ -110,9 +112,15 @@ export class DocumentDiffPage extends TabPanelComponent<DocDiffOptions> implemen
       const targetDoc$: Observable<Document> = this._documentService.getDocument(this._targetCredentials, targetDocId);
       forkJoin([sourceDoc$,
                 targetDoc$
-              ]).subscribe(([sourceDoc, targetDoc]) => {
-                  this.performDiff(sourceDoc, targetDoc);
-                  this.loaded = true;
+              ]).subscribe({
+                  next: ([sourceDoc, targetDoc]) => {
+                    this.performDiff(sourceDoc, targetDoc);
+                    this.loaded = true;
+                  },
+                  error: (error) => {
+                    this._log.error('Error retrieving document contents for diff', error);
+                    this._toastService.showError('Error retrieving document contents for diff.\n\n(See logs for error details.)');
+                  }
                 });
     }
   }
@@ -160,8 +168,9 @@ export class DocumentDiffPage extends TabPanelComponent<DocDiffOptions> implemen
             should help ensure we're right!
           */
           if (lineChange.removed !== true || nextChange.added !== true) {
-// TODO: log values and display an error message
-            throw new Error('Unexpected order of line changes');
+            this._log.warn(`Unexpected order of line changes at #${i}`, lineChange);
+            this._toastService.showError('Unexpected order of line changes encountered.\n\n(See logs for error details.)');
+            return false;
           }
 
           lineDiffs.push({

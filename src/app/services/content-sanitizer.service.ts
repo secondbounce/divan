@@ -6,6 +6,11 @@ const TAB_WIDTH_IN_SPACES: number = 4;
   providedIn: 'root'
 })
 export class ContentSanitizerService {
+  /**
+   * Converts plaintext to HTML, encoding 'unsafe' and new line characters as HTML entities,
+   * optionally preserving indentation indicated with tab characters or multiple leading
+   * spaces.
+   */
   public plaintextToHtml(plaintext: string, preserveIndents: boolean = false): string {
     let escaped: string = this.encodePlaintextForHtml(plaintext)
                               .replace(/\r\n?|\n/g, '<br>');
@@ -23,6 +28,9 @@ export class ContentSanitizerService {
     return escaped;
   }
 
+  /**
+   * Encodes 'unsafe' characters as HTML entities.
+   */
   public encodePlaintextForHtml(plaintext: string): string {
     /* Escaping according to OWASP recommendations:
         https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#rule-1---html-escape-before-inserting-untrusted-data-into-html-element-content

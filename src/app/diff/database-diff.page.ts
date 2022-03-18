@@ -6,9 +6,8 @@ import { Logger, LogService } from '../core/logging';
 import { ServerCredentials } from '../core/model';
 import { DatabaseDiffOptionsComponent } from '../elements';
 import { CompareResult } from '../enums';
-import { CouchDbExportService, DocumentService, ModalService, ServerService, TabManagerService } from '../services';
-import { TabPanel } from '../tabs';
-import { TabPanelComponent } from '../tabs/tab-panel.component';
+import { CouchDbExportService, DocumentService, ModalService, ServerService, TabManagerService, ToastService } from '../services';
+import { TabPanel, TabPanelComponent } from '../tabs';
 import { ModalResult } from '../ui-components';
 import { isEqualStringArrays } from '../utility';
 import { DbDiffOptions } from './db-diff-options';
@@ -43,6 +42,7 @@ export class DatabaseDiffPage extends TabPanelComponent<DbDiffOptions> implement
               private _documentService: DocumentService,
               private _modalService: ModalService,
               private _tabManagerService: TabManagerService,
+              private _toastService: ToastService,
               logService: LogService) {
     super();
 
@@ -59,7 +59,6 @@ export class DatabaseDiffPage extends TabPanelComponent<DbDiffOptions> implement
     if (this.validateParams()) {
       this.run();
     } else {
-// TODO: display error
       this.showOptions();
     }
   }
@@ -78,18 +77,25 @@ export class DatabaseDiffPage extends TabPanelComponent<DbDiffOptions> implement
 
   private validateParams(): boolean {
     let valid: boolean = true;
+    let message: string = '';
 
     if (this.data && this.data.sourceAlias.length > 0 && this.data.targetAlias.length > 0) {
       this._sourceCredentials = this._serverService.getServerCredentials(this.data.sourceAlias);
       if (typeof(this._sourceCredentials) === 'undefined') {
-        this._log.error(`No server registered for '${this.data.sourceAlias}'`);
+        message = `No server registered for '${this.data.sourceAlias}'`;
+        this._log.warn(message);
         valid = false;
       }
 
       this._targetCredentials = this._serverService.getServerCredentials(this.data.targetAlias);
       if (typeof(this._targetCredentials) === 'undefined') {
-        this._log.error(`No server registered for '${this.data.targetAlias}'`);
+        message = `No server registered for '${this.data.targetAlias}'`;
+        this._log.warn(message);
         valid = false;
+      }
+
+      if (!valid) {
+        this._toastService.showWarning(message);
       }
     } else {
       valid = false;
@@ -109,14 +115,20 @@ export class DatabaseDiffPage extends TabPanelComponent<DbDiffOptions> implement
 
       forkJoin([sourceDb,
                 targetDb
-              ]).subscribe((databases) => {
-                  this.source = databases[0];
-                  this.target = databases[1];
+              ]).subscribe({
+                  next: (databases) => {
+                    this.source = databases[0];
+                    this.target = databases[1];
 
-                  if (this.source._design && this.target._design) {
-                    const sourceDesignDocs: DesignDocument[] = Object.values(this.source._design);
-                    const targetDesignDocs: DesignDocument[] = Object.values(this.target._design);
-                    this.generateDesignDocData(sourceDesignDocs, targetDesignDocs);
+                    if (this.source._design && this.target._design) {
+                      const sourceDesignDocs: DesignDocument[] = Object.values(this.source._design);
+                      const targetDesignDocs: DesignDocument[] = Object.values(this.target._design);
+                      this.generateDesignDocData(sourceDesignDocs, targetDesignDocs);
+                    }
+                  },
+                  error: (error) => {
+                    this._log.warn(error);
+                    this._toastService.showError('Error exporting databases for diff.\n\n(See logs for error details.)');
                   }
                 });
     }
@@ -137,6 +149,7 @@ export class DatabaseDiffPage extends TabPanelComponent<DbDiffOptions> implement
                         },
                         error: (error: any) => {
                           this._log.warn(error);
+                          this._toastService.showError('Unable to display Database Diff options dialog.\n\n(See logs for error details.)');
                         }
                       });
   }
