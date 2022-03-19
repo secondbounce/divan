@@ -1,12 +1,5 @@
-table {
-  table-layout: fixed;
-  width: 100%;
-}
-
 th,
 td {
-  vertical-align: baseline;
-
   &:first-child {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -25,6 +18,19 @@ th:last-child {
 td.data {
 // TODO: pick a better font?
   font-family: monospace;
+}
+
+td.actions {
+  padding: 0;
+  text-align: center;
+  vertical-align: middle;
+
+  button {
+    img {
+      height: 1em;
+      width: 1em;
+    }
+  }
 }
 
 .level1 {

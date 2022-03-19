@@ -1,7 +1,6 @@
-<header>
-<!-- TODO: sort these out - tidy up and style properly -->
-	<button (click)="this.showOptions()">Options</button>
-	<button (click)="run()">Reload</button>
+<header class="toolbar">
+	<button title="Options" class="icon-button" (click)="this.showOptions()"><img src="/assets/icons/options.svg" title="Options"></button>
+	<button title="Reload" class="icon-button" (click)="run()"><img src="/assets/icons/refresh.svg" title="Reload"></button>
 </header>
 <table *ngIf="this.source && this.target">
 	<thead>
@@ -70,7 +69,7 @@
 			<td class="data">{{ data.sourceRev }}</td>
 			<td class="data">{{ data.targetRev }}</td>
 			<td class="actions">
-				<button *ngIf="data.canCompare" title="Compare" (click)="showDocumentDiff(data.docId)"><img src="../../assets/icons/compare.svg" title="Compare"></button>
+				<button *ngIf="data.canCompare" title="Compare" class="icon-button" (click)="showDocumentDiff(data.docId)"><img src="/assets/icons/compare.svg" title="Compare"></button>
 			</td>
 		</tr>
 	</tbody>

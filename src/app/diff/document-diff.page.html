@@ -1,8 +1,12 @@
-<header class="source-header"><label>{{ this.sourceTitle }}</label></header>
+<header class="source-header">
+	<label [title]="this.sourceTitle">{{ this.sourceTitle }}</label>
+</header>
 <section #source class="source">
 	<div [innerHtml]="this.sourceDiffs"></div>
 </section>
-<header class="target-header"><label>{{ this.targetTitle }}</label></header>
+<header class="target-header">
+	<label [title]="this.targetTitle">{{ this.targetTitle }}</label>
+</header>
 <section #target class="target">
 	<div [innerHtml]="this.targetDiffs"></div>
 </section>

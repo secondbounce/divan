@@ -1,3 +1,5 @@
+@import "variables";
+
 $panel-gap-per-side: 2px;
 
 :host {
@@ -15,10 +17,12 @@ $panel-gap-per-side: 2px;
 header {
   align-items: center;
   display: flex;
+  min-width: 0;   /* Otherwise won't shrink past total content width */
+  padding-block: $toolbar-padding-vertical;
 
   label {
     overflow: hidden;
-    padding: 0.25em 0.5em;
+    padding-inline: $toolbar-padding-horizontal;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
