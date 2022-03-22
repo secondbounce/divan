@@ -120,11 +120,12 @@ export class DatabaseDiffPage extends TabPanelComponent<DbDiffOptions> implement
                     this.source = databases[0];
                     this.target = databases[1];
 
-                    if (this.source._design && this.target._design) {
-                      const sourceDesignDocs: DesignDocument[] = Object.values(this.source._design);
-                      const targetDesignDocs: DesignDocument[] = Object.values(this.target._design);
-                      this.generateDesignDocData(sourceDesignDocs, targetDesignDocs);
-                    }
+                    /* The `_design` property will be missing (rather than an empty dictionary)
+                      if there are no design documents, so allow for that.
+                    */
+                    const sourceDesignDocs: DesignDocument[] = Object.values(this.source._design ?? {});
+                    const targetDesignDocs: DesignDocument[] = Object.values(this.target._design ?? {});
+                    this.generateDesignDocData(sourceDesignDocs, targetDesignDocs);
                   },
                   error: (error) => {
                     this._log.warn(error);
