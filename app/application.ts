@@ -10,6 +10,7 @@ import { Channel, MenuCommand, RendererEvent } from '../src/app/enums';
 import { ElectronEvent } from './enums';
 import { Logger } from './logger';
 import { RecentlyOpenedService } from './services/recently-opened.service';
+import { AppInfo } from './shared/app-info';
 import { configureLogging } from './shared/log-config';
 import { convertToText } from './shared/string';
 
@@ -20,6 +21,7 @@ export class Application {
   private _mainWindow: BrowserWindow | undefined;
   private _recentlyOpenedService: RecentlyOpenedService = RecentlyOpenedService.instance;
   private _debugMode: boolean;
+  private _appInfo: AppInfo;
   private readonly _log: Logger;
 
   constructor(private _electronApp: Electron.App) {
@@ -28,6 +30,9 @@ export class Application {
     this._log = new Logger('Application');
     this.isMac = process.platform === 'darwin';
     this._debugMode = !_electronApp.isPackaged;
+    this._appInfo = {
+      appName: _electronApp.getName()
+    };
 
     _electronApp.on(ElectronEvent.Activate, this.onElectronActivate);
     _electronApp.on(ElectronEvent.WindowAllClosed, this.onElectronWindowAllClosed);
@@ -196,6 +201,7 @@ export class Application {
     });
 
     this._mainWindow = mainWindow;
+    this._mainWindow.webContents.send(Channel.AppInfo, this._appInfo);
 
     if (this._debugMode) {
       mainWindow.webContents.openDevTools();

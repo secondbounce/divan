@@ -4,6 +4,7 @@ export const enum AriaRole {
 }
 
 export const enum Channel {
+  AppInfo = 'app-info',
   MenuCommand = 'menu-command',
   RendererEvent = 'renderer-event'
 }

@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import { Injectable } from '@angular/core';
 import { ipcRenderer, webFrame } from 'electron';
 
+import { AppInfo } from '~shared/app-info';
 import { Channel, RendererEvent } from '../enums';
 import { isElectron } from '../utility';
 
@@ -17,6 +18,9 @@ export class ElectronService {
   public readonly childProcess?: typeof childProcess;
   public readonly fs?: typeof fs;
   private readonly _ipcRenderer?: typeof ipcRenderer;
+  private _appInfo: AppInfo = {
+    appName: 'Divan'  /* Default if running in browsers */
+  };
 
   constructor() {
     if (isElectron()) {
@@ -36,9 +40,17 @@ export class ElectronService {
       // If you want to use a NodeJS 3rd party deps in Renderer process,
       // ipcRenderer.invoke can serve many common use cases.
       // https://www.electronjs.org/docs/latest/api/ipc-renderer#ipcrendererinvokechannel-args
+
+      this._ipcRenderer?.on(Channel.AppInfo, (_event, ...args) => {
+                          this._appInfo = args[0];
+                        });
     } else {
 // TODO: log this!
     }
+  }
+
+  public get appName(): string {
+    return this._appInfo.appName;
   }
 
   public on(channel: Channel, listener: (...args: any[]) => void): void {
