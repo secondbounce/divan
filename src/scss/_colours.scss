@@ -1,19 +1,16 @@
-/* Using (deprecated) CSS 2 system colours, for now, as CSS 3 system colours
-  aren't supported in Electron yet.
-*/
 
 :root {
   --dv-default-color: #4d4d4d;
-  --dv-default-border-color: WindowFrame;
+  --dv-default-border-color: #fff;
   --dv-default-invalid: #da0000;
 
   --dv-scrollbar-thumb: #999;
   --dv-scrollbar-track: #dedede;
 
   --dv-modal-overlay-bg: #00000020;
-  --dv-form-bg: Window;
-  --dv-form-border: ActiveBorder;
-  --dv-form-header-bg: ActiveCaption;
+  --dv-form-bg: #fff;
+  --dv-form-border: #b9b9b9;
+  --dv-form-header-bg: #69006d;
   --dv-control-border: #a5a5a5;
 
   --dv-tabstrip-bg: #f3f3f3;
