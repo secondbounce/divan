@@ -70,6 +70,8 @@
 			<td class="data" [title]="data.targetDoc?._rev ?? data.targetRev">{{ data.targetRev }}</td>
 			<td class="actions">
 				<button *ngIf="data.canCompare" type="button" title="Compare" class="icon-button" (click)="showDocumentDiff(data.docId)"><img src="/assets/icons/compare.svg" title="Compare"></button>
+				<button *ngIf="data.canCopyToTarget" type="button" class="icon-button" title="Copy document to target" (click)="copyToTarget(data.docId)"><img src="/assets/icons/copy-right.svg" title="Copy document to target"></button>
+				<button *ngIf="data.canCopyToSource" type="button" class="icon-button" title="Copy document to source" (click)="copyToSource(data.docId)"><img src="/assets/icons/copy-left.svg" title="Copy document to source"></button>
 			</td>
 		</tr>
 	</tbody>

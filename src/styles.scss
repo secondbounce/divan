@@ -22,8 +22,10 @@ button {
   }
   img {
     flex-shrink: 0;
-    height: 1.2em;
-    width: 1.2em;
+    height: $icon-button-img-size;
+    min-height: $icon-button-img-size;
+    min-width: $icon-button-img-size;
+    width: $icon-button-img-size;
   }
   & + button {
     margin-inline-start: 0.5em;

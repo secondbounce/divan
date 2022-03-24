@@ -23,3 +23,9 @@ export const enum MenuCommand {
 export const enum RendererEvent {
   ServerOpened = 'server-opened'
 }
+
+export const enum ResultStatus {
+  SoftFail = -1,
+  HardFail = 0,
+  Success = 1
+}

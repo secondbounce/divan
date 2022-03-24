@@ -5,6 +5,7 @@ import { map, Observable, ReplaySubject } from 'rxjs';
 import { ServerMetaInfo } from '../core/couchdb';
 import { LogService } from '../core/logging';
 import { Server, ServerCredentials } from '../core/model';
+import { getAuthorizationHeader } from '../utility';
 import { BaseService } from './base.service';
 import { CouchDbService } from './couchdb.service';
 
@@ -74,7 +75,7 @@ export class ServerService extends BaseService implements OnDestroy {
     const url: URL = new URL(credentials.address);
     url.pathname = '/';
     const metaInfoUrl: string = url.toString();
-    const headers: HttpHeaders = this.getAuthorizationHeader(credentials);
+    const headers: HttpHeaders = getAuthorizationHeader(credentials);
 
     return this._couchDbService.get<ServerMetaInfo>(metaInfoUrl, headers)
                                .pipe(map((metaInfo) => {
@@ -101,7 +102,7 @@ export class ServerService extends BaseService implements OnDestroy {
     const url: URL = new URL(credentials.address);
     url.pathname = '/_all_dbs';
     const allDbsUrl: string = url.toString();
-    const headers: HttpHeaders = this.getAuthorizationHeader(credentials);
+    const headers: HttpHeaders = getAuthorizationHeader(credentials);
 
     return this._couchDbService.get<string[]>(allDbsUrl, headers);
   }

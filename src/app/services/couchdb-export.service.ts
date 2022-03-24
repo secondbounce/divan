@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators';
 import { Database, DbInfo, DESIGN_DOC_ID_PREFIX, DesignDocument, Document, Security } from '../core/couchdb';
 import { LogService } from '../core/logging';
 import { DatabaseCredentials, ServerCredentials } from '../core/model';
+import { getAuthorizationHeader } from '../utility';
 import { BaseService } from './base.service';
 import { CouchDbService } from './couchdb.service';
 import { DocumentService } from './document.service';
@@ -30,7 +31,7 @@ export class CouchDbExportService extends BaseService {
 
   public exportDatabase(credentials: ServerCredentials, dbName: string, _includeDocs: boolean): Observable<Database> {
     const serverUrl: URL = new URL(credentials.address);
-    const headers: HttpHeaders = this.getAuthorizationHeader(credentials);
+    const headers: HttpHeaders = getAuthorizationHeader(credentials);
     const dbCredentials: DatabaseCredentials = new DatabaseCredentials(credentials, dbName);
 
     const dbInfo$: Observable<DbInfo> = this.getDbInfo(serverUrl, dbName, headers);

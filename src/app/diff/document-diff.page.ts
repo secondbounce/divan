@@ -3,11 +3,12 @@ import { SafeHtml } from '@angular/platform-browser';
 import { Change, diffChars, diffLines } from 'diff';
 import { forkJoin, Observable } from 'rxjs';
 
-import { Document } from '../core/couchdb';
 import { convertToText } from '~shared/string';
+import { DesignDocument, Document } from '../core/couchdb';
 import { Logger, LogService } from '../core/logging';
 import { DatabaseCredentials, ServerCredentials } from '../core/model';
-import { ContentSanitizerService, DocumentService, ServerService, ToastService } from '../services';
+import { ResultStatus } from '../enums';
+import { ContentSanitizerService, DialogService, DocumentService, ServerService, ToastService } from '../services';
 import { TabPanelComponent } from '../tabs';
 import { DocDiffOptions } from './doc-diff-options';
 
@@ -41,19 +42,22 @@ export class DocumentDiffPage extends TabPanelComponent<DocDiffOptions> implemen
   public targetTitle: string = '';
   public sourceDiffs: SafeHtml | undefined;
   public targetDiffs: SafeHtml | undefined;
-  public loaded: boolean = false;
+  public canCopy: boolean = false;
   @ViewChild('source') private _sourceSection!: ElementRef;
   @ViewChild('target') private _targetSection!: ElementRef;
   @ViewChild('vscroller') private _vscroller!: ElementRef;
   @ViewChild('hscroller') private _hscroller!: ElementRef;
   private _sourceCredentials: DatabaseCredentials | undefined;
   private _targetCredentials: DatabaseCredentials | undefined;
+  private _sourceDoc: DesignDocument | undefined;
+  private _targetDoc: DesignDocument | undefined;
   private _scrollersHaveBeenSet: boolean = false;
   private readonly _log: Logger;
 
   constructor(private _serverService: ServerService,
               private _documentService: DocumentService,
               private _contentSanitizerService: ContentSanitizerService,
+              private _dialogService: DialogService,
               private _toastService: ToastService,
               logService: LogService) {
     super();
@@ -123,8 +127,15 @@ export class DocumentDiffPage extends TabPanelComponent<DocDiffOptions> implemen
                 targetDoc$
               ]).subscribe({
                   next: ([sourceDoc, targetDoc]) => {
+                    /* We're not currently supporting the comparing/deploying of documents
+                      with different ids.  If/when we do, `areContentsDifferent()` will need
+                      to take the ids into account (and we'll need to make sure the rest of
+                      this code works too, obvs).
+                    */
+                    this.canCopy = this.areContentsDifferent(sourceDoc, targetDoc);
                     this.performDiff(sourceDoc, targetDoc);
-                    this.loaded = true;
+                    this._sourceDoc = sourceDoc as DesignDocument;
+                    this._targetDoc = targetDoc as DesignDocument;
                   },
                   error: (error) => {
                     this._log.error('Error retrieving document contents for diff', error);
@@ -134,7 +145,14 @@ export class DocumentDiffPage extends TabPanelComponent<DocDiffOptions> implemen
     }
   }
 
-  private performDiff(sourceDoc: Document, targetDoc: Document): void {
+  private areContentsDifferent(sourceDoc: Document, targetDoc: Document): boolean {
+    const sourceHash: string = this._documentService.getDocumentHashValue(sourceDoc);
+    const targetHash: string = this._documentService.getDocumentHashValue(targetDoc);
+
+    return sourceHash !== targetHash;
+  }
+
+  private performDiff(sourceDoc: Document, targetDoc: Document): boolean {
     /* IMPORTANT  Using `convertToText()` ensures that all line endings are '\n', so we don't
       need to consider other formats when handling the line endings.
     */
@@ -157,6 +175,7 @@ export class DocumentDiffPage extends TabPanelComponent<DocDiffOptions> implemen
                                               newlineIsToken: true
                                             });
     const lineDiffs: LineDiff[] = [];
+    let hasDifferences: boolean = false;
 
     for (let i: number = 0; i < lineChanges.length; i++) {
       const lineChange: Change = lineChanges[i];
@@ -210,6 +229,8 @@ export class DocumentDiffPage extends TabPanelComponent<DocDiffOptions> implemen
             targetState: lineChange.added == true ? DiffState.Added : DiffState.Missing
           });
         }
+
+        hasDifferences = true;
       } else {
         /* Lines match.  However, when we have a changed line where both sides end with the
           same line ending, the newline char will be seen as a separate, 'matching' change.
@@ -250,6 +271,8 @@ export class DocumentDiffPage extends TabPanelComponent<DocDiffOptions> implemen
             target: lineChange.value,
             targetState: DiffState.NoChange
           });
+        } else {
+          hasDifferences = true;
         }
       }
     }
@@ -257,6 +280,8 @@ export class DocumentDiffPage extends TabPanelComponent<DocDiffOptions> implemen
     const [sourceDiffs, targetDiffs] = this.constructHtmlForLines(lineDiffs);
     this.sourceDiffs = sourceDiffs;
     this.targetDiffs = targetDiffs;
+
+    return hasDifferences;
   }
 
   private checkMovingLeadingNewLineToPrevious(lineChange: Change, previous: LineDiff): boolean {
@@ -460,5 +485,55 @@ export class DocumentDiffPage extends TabPanelComponent<DocDiffOptions> implemen
       sourceSection.scrollTop = scroller.scrollTop;
       targetSection.scrollTop = scroller.scrollTop;
     }
+  }
+
+  public copyToTarget(): void {
+    this.promptToDeployDesignDoc(this._targetCredentials, this._sourceDoc);
+  }
+
+  public copyToSource(): void {
+    this.promptToDeployDesignDoc(this._sourceCredentials, this._targetDoc);
+  }
+
+  private promptToDeployDesignDoc(dbCredentials: DatabaseCredentials | undefined, designDoc: DesignDocument | undefined): void {
+    if (dbCredentials && designDoc) {
+      const target: string = dbCredentials.serverCredentials.alias + '/' + dbCredentials.name;
+      this._dialogService.showYesNoMessageBox(`Are you sure you want to copy '${designDoc._id}' to ${target}?`)
+                         .subscribe({
+                            next: (result) => {
+                              if (result) {
+                                this.deployDesignDoc(dbCredentials, designDoc);
+                              }
+                            },
+                            error: (_) => {
+                              this._toastService.showError('An error occurred displaying the confirmation message box.\n\n(See logs for error details.)');
+                            }
+                          });
+    }
+  }
+
+  private deployDesignDoc(dbCredentials: DatabaseCredentials, designDoc: DesignDocument): void {
+    this._documentService.deployDesignDoc(dbCredentials, designDoc)
+                         .subscribe({
+                            next: (resultStatus) => {
+                              if (resultStatus === ResultStatus.HardFail) {
+                                this._toastService.showError('An error occurred while copying the design document.\n\n(See logs for error details.)');
+                              } else {
+                                if (resultStatus === ResultStatus.SoftFail) {
+                                  this._toastService.showWarning('The design document was copied successfully, but the clean-up failed and may have left temporary documents in the database.\n\n(See logs for error details.)');
+                                } else {
+                                  this._log.assert(resultStatus === ResultStatus.Success,
+                                                   `Unrecognized ResultStatus enum - ${resultStatus}`);
+                                }
+
+                                if (this.data) {
+                                  this.run(this.data.sourceDocId, this.data.targetDocId);
+                                }
+                              }
+                            },
+                            error: (error) => {
+                              this._log.error('An error occurred while copying the design document', error);
+                              this._toastService.showError('An error occurred while copying the design document.\n\n(See logs for error details.)');
+                            }});
   }
 }

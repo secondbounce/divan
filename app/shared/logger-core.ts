@@ -14,6 +14,14 @@ export interface LoggerFunctions {
 export class LoggerCore {
   constructor(private _log: LoggerFunctions) {}
 
+  public assert(condition: boolean | undefined, message: string | null | undefined, error?: any): void;
+  public assert(condition: boolean | undefined, error: any): void;
+  public assert(condition: boolean | undefined, messageOrError: any, error?: any): void {
+    if (condition !== true) {
+      this._log.warn(this.getMessage(messageOrError, error));
+    }
+  }
+
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types -- we have no idea what object may need to be logged */
   public debug(message: string | null | undefined, error?: any): void;
   public debug(error: any): void;

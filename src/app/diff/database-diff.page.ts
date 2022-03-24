@@ -3,10 +3,10 @@ import { forkJoin, Observable } from 'rxjs';
 
 import { Database, DESIGN_DOC_ID_PREFIX, DesignDocument } from '../core/couchdb';
 import { Logger, LogService } from '../core/logging';
-import { ServerCredentials } from '../core/model';
+import { DatabaseCredentials, ServerCredentials } from '../core/model';
 import { DatabaseDiffOptionsComponent } from '../elements';
-import { CompareResult } from '../enums';
-import { CouchDbExportService, DocumentService, ModalService, ServerService, TabManagerService, ToastService } from '../services';
+import { CompareResult, ResultStatus } from '../enums';
+import { CouchDbExportService, DialogService, DocumentService, ModalService, ServerService, TabManagerService, ToastService } from '../services';
 import { TabPanel, TabPanelComponent } from '../tabs';
 import { ModalResult } from '../ui-components';
 import { isEqualStringArrays } from '../utility';
@@ -23,6 +23,8 @@ interface DocComparisonData {
   targetRev: string;
   identical: boolean;
   canCompare: boolean;
+  canCopyToSource: boolean;
+  canCopyToTarget: boolean;
 }
 
 @Component({
@@ -45,6 +47,7 @@ export class DatabaseDiffPage extends TabPanelComponent<DbDiffOptions> implement
               private _modalService: ModalService,
               private _tabManagerService: TabManagerService,
               private _toastService: ToastService,
+              private _dialogService: DialogService,
               logService: LogService) {
     super();
 
@@ -178,6 +181,20 @@ export class DatabaseDiffPage extends TabPanelComponent<DbDiffOptions> implement
     }
   }
 
+  public copyToSource(docId: string): void {
+    if (this.data) {
+      const designDoc: DesignDocument | undefined = this.designDocData.find(data => data.docId === docId)?.targetDoc;
+      this.promptToDeployDesignDoc(this._sourceCredentials, this.data.sourceDb, designDoc);
+    }
+  }
+
+  public copyToTarget(docId: string): void {
+    if (this.data) {
+      const designDoc: DesignDocument | undefined = this.designDocData.find(data => data.docId === docId)?.sourceDoc;
+      this.promptToDeployDesignDoc(this._targetCredentials, this.data.targetDb, designDoc);
+    }
+  }
+
   private generateDesignDocData(sourceDesignDocs: DesignDocument[], targetDesignDocs: DesignDocument[]): void {
     let sourceIndex: number = 0;
     let targetIndex: number = 0;
@@ -240,6 +257,8 @@ export class DatabaseDiffPage extends TabPanelComponent<DbDiffOptions> implement
     */
     const sourceHash: string = this._documentService.getDocumentHashValue(sourceDoc);
     const targetHash: string = this._documentService.getDocumentHashValue(targetDoc);
+    const existsInTarget: boolean = typeof(targetDoc) !== 'undefined';
+    const existsInSource: boolean = typeof(sourceDoc) !== 'undefined';
 
     designDocData.push({ docId,
                          label: this.formatDesignDocId(docId),
@@ -248,7 +267,9 @@ export class DatabaseDiffPage extends TabPanelComponent<DbDiffOptions> implement
                          sourceRev: this.shortenDocRev(sourceDoc?._rev || ''),
                          targetRev: this.shortenDocRev(targetDoc?._rev || ''),
                          identical: sourceHash === targetHash,
-                         canCompare: (typeof(sourceDoc) !== 'undefined' && typeof(targetDoc) !== 'undefined')
+                         canCompare: (existsInSource && existsInTarget),
+                         canCopyToSource: !existsInSource,
+                         canCopyToTarget: !existsInTarget
                       });
   }
 
@@ -262,5 +283,51 @@ export class DatabaseDiffPage extends TabPanelComponent<DbDiffOptions> implement
     return rev ? rev.replace(/^((?:\d+-)?[\da-f]{4})[\da-f]+([\da-f]{4})$/i,
                              ((_match, p1, p2, _offset, _source) => p1 + '...' + p2))
                : '';
+  }
+
+  private promptToDeployDesignDoc(serverCredentials: ServerCredentials | undefined,
+                                  dbName: string,
+                                  designDoc: DesignDocument | undefined): void {
+    if (this.data && serverCredentials && designDoc) {
+      const dbCredentials: DatabaseCredentials = new DatabaseCredentials(serverCredentials, dbName);
+      const target: string = dbCredentials.serverCredentials.alias + '/' + dbCredentials.name;
+
+      this._dialogService.showYesNoMessageBox(`Are you sure you want to copy '${designDoc._id}' to ${target}?`)
+                         .subscribe({
+                            next: (result) => {
+                              if (result) {
+                                this.deployDesignDoc(dbCredentials, designDoc);
+                              }
+                            },
+                            error: (_) => {
+                              this._toastService.showError('An error occurred displaying the confirmation message box.\n\n(See logs for error details.)');
+                            }
+                          });
+    }
+  }
+
+  private deployDesignDoc(dbCredentials: DatabaseCredentials, designDoc: DesignDocument): void {
+    this._documentService.deployDesignDoc(dbCredentials, designDoc)
+                         .subscribe({
+                            next: (resultStatus) => {
+                              if (resultStatus === ResultStatus.HardFail) {
+                                this._toastService.showError('An error occurred while copying the design document.\n\n(See logs for error details.)');
+                              } else {
+                                if (resultStatus === ResultStatus.SoftFail) {
+                                  this._toastService.showWarning('The design document was copied successfully, but the clean-up failed and may have left temporary documents in the database.\n\n(See logs for error details.)');
+                                } else {
+                                  this._log.assert(resultStatus === ResultStatus.Success,
+                                                   `Unrecognized ResultStatus enum - ${resultStatus}`);
+                                }
+
+                                if (this.data) {
+                                  this.run();
+                                }
+                              }
+                            },
+                            error: (error) => {
+                              this._log.error('An error occurred while copying the design document', error);
+                              this._toastService.showError('An error occurred while copying the design document.\n\n(See logs for error details.)');
+                            }});
   }
 }

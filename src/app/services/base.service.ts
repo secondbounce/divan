@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 import { Logger } from '../core/logging';
 import { LogService } from '../core/logging/log.service';
 import { ServerCredentials } from '../core/model';
+import { getAuthorizationHeader } from '../utility';
 
 @Injectable()
 export abstract class BaseService implements OnDestroy {
@@ -20,19 +21,13 @@ export abstract class BaseService implements OnDestroy {
     this.isBeingDestroyed$.complete();
   }
 
-  protected getAuthorizationHeader(credentials: ServerCredentials): HttpHeaders {
-    return new HttpHeaders({
-      Authorization: `Basic ${btoa(credentials.username + ':' + credentials.password)}`
-    });
-  }
-
   protected getUrlAndHeaders(credentials: ServerCredentials, pathname: string): [string, HttpHeaders] {
     const url: URL = new URL(credentials.address);
     url.pathname = pathname;
 
     return [
       url.toString(),
-      this.getAuthorizationHeader(credentials)
+      getAuthorizationHeader(credentials)
     ];
   }
 
