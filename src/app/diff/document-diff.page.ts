@@ -1,4 +1,4 @@
-import { AfterViewChecked, ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewChecked, ChangeDetectionStrategy, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
 import { Change, diffChars, diffLines } from 'diff';
 import { forkJoin, Observable } from 'rxjs';
@@ -28,7 +28,6 @@ interface LineDiff {
   targetState: DiffState;
 }
 
-// TODO: work out how to get header label to overflow when view width is reduced
 // TODO: display progress indicator (for deployment function only?)
 
 @Component({
@@ -74,6 +73,16 @@ export class DocumentDiffPage extends TabPanelComponent<DocDiffOptions> implemen
     if (!this._scrollersHaveBeenSet) {
       this.configureScrollers();
     }
+  }
+
+  @HostListener('wheel', ['$event'])
+  public onWheel($event: WheelEvent): void {
+    /* Scrolling with the mouse wheel when over anything other than the 'scroller' DIVs won't
+      do anything as 'overflow' is hidden.  So we need to explicitly scroll the 'scroller' DIV
+      by the corresponding amount.
+    */
+    const scroller: HTMLDivElement = this._vscroller.nativeElement as HTMLDivElement;
+    scroller.scrollBy(0, $event.deltaY);
   }
 
   public setData(data: DocDiffOptions): void {

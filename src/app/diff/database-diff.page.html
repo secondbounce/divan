@@ -1,6 +1,6 @@
 <header class="toolbar">
-	<button title="Options" class="icon-button" (click)="this.showOptions()"><img src="/assets/icons/options.svg" title="Options"></button>
 	<button title="Reload" class="icon-button" (click)="run()"><img src="/assets/icons/refresh.svg" title="Reload"></button>
+	<button title="Options" class="icon-button" (click)="this.showOptions()"><img src="/assets/icons/options.svg" title="Options"></button>
 </header>
 <table *ngIf="this.source && this.target">
 	<thead>
@@ -66,10 +66,10 @@
 		</tr>
 		<tr *ngFor="let data of this.designDocData" [ngClass]="{'identical': data.identical}" (dblclick)="showDocumentDiff(data.docId)">
 			<td class="level2" [title]="data.label">{{ data.label }}</td>
-			<td class="data">{{ data.sourceRev }}</td>
-			<td class="data">{{ data.targetRev }}</td>
+			<td class="data" [title]="data.sourceDoc?._rev ?? data.sourceRev">{{ data.sourceRev }}</td>
+			<td class="data" [title]="data.targetDoc?._rev ?? data.targetRev">{{ data.targetRev }}</td>
 			<td class="actions">
-				<button *ngIf="data.canCompare" title="Compare" class="icon-button" (click)="showDocumentDiff(data.docId)"><img src="/assets/icons/compare.svg" title="Compare"></button>
+				<button *ngIf="data.canCompare" type="button" title="Compare" class="icon-button" (click)="showDocumentDiff(data.docId)"><img src="/assets/icons/compare.svg" title="Compare"></button>
 			</td>
 		</tr>
 	</tbody>

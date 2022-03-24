@@ -17,6 +17,8 @@ import { DocumentDiffPage } from './document-diff.page';
 interface DocComparisonData {
   docId: string;
   label: string;
+  sourceDoc?: DesignDocument;
+  targetDoc?: DesignDocument;
   sourceRev: string;
   targetRev: string;
   identical: boolean;
@@ -241,6 +243,8 @@ export class DatabaseDiffPage extends TabPanelComponent<DbDiffOptions> implement
 
     designDocData.push({ docId,
                          label: this.formatDesignDocId(docId),
+                         sourceDoc,
+                         targetDoc,
                          sourceRev: this.shortenDocRev(sourceDoc?._rev || ''),
                          targetRev: this.shortenDocRev(targetDoc?._rev || ''),
                          identical: sourceHash === targetHash,
