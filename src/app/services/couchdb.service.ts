@@ -1,11 +1,9 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, Observable, of } from 'rxjs';
 
-import { DesignDocQueryParams } from '../core/couchdb';
+import { DesignDocQueryParams, DocInfo, DocResponse } from '../core/couchdb';
 import { LogService } from '../core/logging';
-import { DocInfo } from '../core/model';
 import { BaseService } from './base.service';
 
 @Injectable()
@@ -63,30 +61,29 @@ export class CouchDbService extends BaseService {
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
-  public copy(url: string, toDocId: string, headers: HttpHeaders): Observable<object> {
-    return this._http.request('COPY', url,
-                              {
-                                headers: headers.set('Accept', 'application/json')
-                                                .set('Content-Type', 'application/json')
-                                                .set('Destination', toDocId)
-                                // body?: any;
-                                // context?: HttpContext;
-                                // observe?: 'body';
-                                // params?: HttpParams | {
-                                //     [param: string]: string | number | boolean | ReadonlyArray<string | number | boolean>;
-                                // };
-                                // responseType?: 'json';
-                                // reportProgress?: boolean;
-                                // withCredentials?: boolean;
-                              });
+  public copy(url: string, toDocId: string, headers: HttpHeaders): Observable<DocResponse> {
+    return this._http.request<DocResponse>('COPY', url,
+                                           {
+                                            headers: headers.set('Accept', 'application/json')
+                                                            .set('Content-Type', 'application/json')
+                                                            .set('Destination', toDocId)
+                                            // body?: any;
+                                            // context?: HttpContext;
+                                            // observe?: 'body';
+                                            // params?: HttpParams | {
+                                            //     [param: string]: string | number | boolean | ReadonlyArray<string | number | boolean>;
+                                            // };
+                                            // responseType?: 'json';
+                                            // reportProgress?: boolean;
+                                            // withCredentials?: boolean;
+                                           });
   }
 
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  public delete(url: string, headers: HttpHeaders): Observable<object> {
-    return this._http.delete(url,
-                             {
-                              headers: headers.set('Accept', 'application/json')
-                             });
+  public delete(url: string, headers: HttpHeaders): Observable<DocResponse> {
+    return this._http.delete<DocResponse>(url,
+                                          {
+                                            headers: headers.set('Accept', 'application/json')
+                                          });
   }
 
   public getDocInfo(url: string, headers: HttpHeaders): Observable<DocInfo> {
