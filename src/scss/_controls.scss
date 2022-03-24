@@ -15,20 +15,8 @@ form {
     grid-column: 2 / 3;
     margin-top: -$control-padding;
   }
-  footer {
-    align-items: center;
-    display: flex;
-    gap: $control-padding;
+  .form-actions {
     grid-column: 1 / 3;
-    justify-content: flex-end;
-    margin-top: $control-padding;
-
-    > span {
-      flex-grow: 1;
-    }
-    button {
-      min-width: 5em;
-    }
   }
 }
 

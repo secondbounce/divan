@@ -11,7 +11,16 @@ import { LogService } from './core/logging';
 import { DiffModule } from './diff/diff.module';
 import { ElementsModule } from './elements/elements.module';
 import { ServersModule } from './servers/servers.module';
-import { ContentSanitizerService, CouchDbExportService, CouchDbService, DocumentService, ElectronService, ModalService, ServerService, ToastService } from './services';
+import { ContentSanitizerService,
+         CouchDbExportService,
+         CouchDbService,
+         DialogService,
+         DocumentService,
+         ElectronService,
+         ModalService,
+         ServerService,
+         ToastService
+       } from './services';
 import { TabsModule } from './tabs/tabs.module';
 import { UiComponentsModule } from './ui-components/ui-components.module';
 
@@ -36,6 +45,7 @@ import { UiComponentsModule } from './ui-components/ui-components.module';
     ContentSanitizerService,
     CouchDbExportService,
     CouchDbService,
+    DialogService,
     DocumentService,
     ElectronService,
     LogService,

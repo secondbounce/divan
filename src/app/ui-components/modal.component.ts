@@ -18,6 +18,7 @@ export abstract class ModalComponent extends FormComponent {
   @HostBinding('attr.aria-hidden') protected _hidden: boolean = false;
   @HostBinding('attr.aria-modal') protected readonly _modal: boolean = true;  /* Never changed, just adds attribute to host element */
   @HostBinding('tabindex') protected readonly _tabindex: number = -1;  /* Never changed, just adds attribute to host element */
+  protected _cancelValue: any;
 
   @HostListener('window:keydown.esc', ['$event'])
   protected onEscKeyDown($event: KeyboardEvent): void {
@@ -25,7 +26,7 @@ export abstract class ModalComponent extends FormComponent {
       $event.preventDefault();
 // TODO: should we have show/hide methods too?
       // this.hide();
-      this.cancel();
+      this.cancel(this._cancelValue);
     }
   }
 
@@ -33,7 +34,7 @@ export abstract class ModalComponent extends FormComponent {
     this.closed.next({ ok: true, data });
   }
 
-  protected cancel(): void {
-    this.closed.next({ ok: false });
+  protected cancel(data?: any): void {
+    this.closed.next({ ok: false, data });
   }
 }

@@ -1,3 +1,6 @@
+/* HACK ALERT!  Just a quick way to lighten/darken the underlying colour */
+$color-lighten: #ffffff70;
+$color-darken: #00000030;
 
 :root {
   --dv-default-color: #4d4d4d;
@@ -11,11 +14,14 @@
   --dv-form-bg: #fff;
   --dv-form-border: #b9b9b9;
   --dv-form-header-bg: #69006d;
+  --dv-form-header-bg-hover: $color-lighten;
+  --dv-form-header-color: #ffffff;
   --dv-control-border: #a5a5a5;
 
   --dv-tabstrip-bg: #f3f3f3;
   --dv-tab-active-color: var(--dv-default-color);
   --dv-tab-active-bg: #fff;
+  --dv-tab-active-bg-hover: $color-darken;
   --dv-tab-inactive-color: var(--dv-default-color);
   --dv-tab-inactive-bg: #ececec;
 

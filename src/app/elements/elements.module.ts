@@ -4,6 +4,7 @@ import { createCustomElement } from '@angular/elements';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { DatabaseDiffOptionsComponent } from './database-diff-options.component';
+import { MessageBoxComponent } from './message-box.component';
 import { SelectServerComponent } from './select-server.component';
 
 @NgModule({
@@ -14,10 +15,12 @@ import { SelectServerComponent } from './select-server.component';
   ],
   exports: [
     DatabaseDiffOptionsComponent,
+    MessageBoxComponent,
     SelectServerComponent
   ],
   declarations: [
     DatabaseDiffOptionsComponent,
+    MessageBoxComponent,
     SelectServerComponent
   ],
   providers: []
@@ -31,5 +34,9 @@ export class ElementsModule {
     elementConstructor = createCustomElement(DatabaseDiffOptionsComponent,
                                              { injector });
     customElements.define(DatabaseDiffOptionsComponent.elementTag, elementConstructor);
+
+    elementConstructor = createCustomElement(MessageBoxComponent,
+                                             { injector });
+    customElements.define(MessageBoxComponent.elementTag, elementConstructor);
   }
 }

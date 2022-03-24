@@ -24,7 +24,7 @@
 	<p *ngIf="this.targetDatabaseControl.invalid && (this.targetDatabaseControl.dirty || this.targetDatabaseControl.touched)" class="form-validation">
 		<ng-template [ngIf]="this.targetDatabaseControl.errors?.required">Please select a database for the target</ng-template>
 	</p>
-	<footer>
+	<footer class="form-actions">
 		<button type="button" (click)="swapSourceTarget()">Swap</button>
 		<span></span>
 		<button type="submit">Open</button>

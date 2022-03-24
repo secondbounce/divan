@@ -1,0 +1,13 @@
+<div class="background"></div>
+<div class="message-box" role="document">
+	<summary [attr.aria-label]="this.title">
+		{{ this.title }}
+		<button type="button" [value]="this.cancelValue" [attr.data-button-id]="this.cancelId" title="Close" class="close-button" (click)="onClick($event)">
+			<img src="/assets/icons/close.svg" title="Close">
+		</button>
+	</summary>
+	<div [innerHTML]="this.message"></div>
+	<footer class="form-actions">
+		<button *ngFor="let button of this.options.buttons; index as i" type="button" [value]="button.returnValue" [attr.data-button-id]="i" (click)="onClick($event)">{{ button.label }}</button>
+	</footer>
+</div>

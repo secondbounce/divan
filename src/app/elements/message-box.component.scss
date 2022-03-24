@@ -1,0 +1,29 @@
+@import 'mixins';
+@import "variables";
+
+:host {
+  --dv-modal-overlay-bg: transparent;
+
+  @extend %modal;
+
+  summary {
+    align-items: center;
+    background-color: var(--dv-form-header-bg);
+    color: var(--dv-form-header-color);
+    display: flex;
+    justify-content: space-between;
+    margin: 0 (-1 * $form-padding) $control-padding;
+    padding: 0.3em 0.5em;
+  }
+
+  .message-box {
+    align-items: center;
+    background-color: var(--dv-form-bg);
+    border: 1px solid var(--dv-form-border);
+    box-shadow: 0 0 9px 0 rgba(0,0,0,0.25);
+    max-width: 400px;   /* Limit width if screen is wider than 400px */
+    padding: 0 $form-padding $form-padding;
+    width: 100%;
+    z-index: 2;
+  }
+}
