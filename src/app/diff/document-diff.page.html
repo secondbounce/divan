@@ -1,12 +1,12 @@
 <header class="source-header">
 	<label [title]="this.sourceTitle">{{ this.sourceTitle }}</label>
-	<button type="button" type="button" class="icon-button" title="Copy document to target" [disabled]="!this.canCopy" (click)="copyToTarget()"><img src="/assets/icons/copy-right.svg" title="Copy document to target"></button>
+	<button type="button" type="button" class="icon-button" title="Copy document to target" [disabled]="!this.canCopy" (click)="copyToTarget()"><svg-icon src="/assets/icons/copy-right.svg"></svg-icon></button>
 </header>
 <section #source class="source">
 	<div [innerHtml]="this.sourceDiffs"></div>
 </section>
 <header class="target-header">
-	<button type="button" type="button" class="icon-button" title="Copy document to source" [disabled]="!this.canCopy" (click)="copyToSource()"><img src="/assets/icons/copy-left.svg" title="Copy document to source"></button>
+	<button type="button" type="button" class="icon-button" title="Copy document to source" [disabled]="!this.canCopy" (click)="copyToSource()"><svg-icon src="/assets/icons/copy-left.svg"></svg-icon></button>
 	<label [title]="this.targetTitle">{{ this.targetTitle }}</label>
 </header>
 <section #target class="target">

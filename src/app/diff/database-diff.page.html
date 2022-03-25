@@ -1,6 +1,6 @@
 <header class="toolbar">
-	<button title="Reload" class="icon-button" (click)="run()"><img src="/assets/icons/refresh.svg" title="Reload"></button>
-	<button title="Options" class="icon-button" (click)="this.showOptions()"><img src="/assets/icons/options.svg" title="Options"></button>
+	<button title="Reload" class="icon-button" (click)="run()"><svg-icon src="/assets/icons/refresh.svg"></svg-icon></button>
+	<button title="Options" class="icon-button" (click)="this.showOptions()"><svg-icon src="/assets/icons/options.svg"></svg-icon></button>
 </header>
 <table *ngIf="this.source && this.target">
 	<thead>
@@ -69,9 +69,9 @@
 			<td class="data" [title]="data.sourceDoc?._rev ?? data.sourceRev">{{ data.sourceRev }}</td>
 			<td class="data" [title]="data.targetDoc?._rev ?? data.targetRev">{{ data.targetRev }}</td>
 			<td class="actions">
-				<button *ngIf="data.canCompare" type="button" title="Compare" class="icon-button" (click)="showDocumentDiff(data.docId)"><img src="/assets/icons/compare.svg" title="Compare"></button>
-				<button *ngIf="data.canCopyToTarget" type="button" class="icon-button" title="Copy document to target" (click)="copyToTarget(data.docId)"><img src="/assets/icons/copy-right.svg" title="Copy document to target"></button>
-				<button *ngIf="data.canCopyToSource" type="button" class="icon-button" title="Copy document to source" (click)="copyToSource(data.docId)"><img src="/assets/icons/copy-left.svg" title="Copy document to source"></button>
+				<button *ngIf="data.canCompare" type="button" title="Compare" class="icon-button" (click)="showDocumentDiff(data.docId)"><svg-icon src="/assets/icons/compare.svg"></svg-icon></button>
+				<button *ngIf="data.canCopyToTarget" type="button" class="icon-button" title="Copy document to target" (click)="copyToTarget(data.docId)"><svg-icon src="/assets/icons/copy-right.svg"></svg-icon></button>
+				<button *ngIf="data.canCopyToSource" type="button" class="icon-button" title="Copy document to source" (click)="copyToSource(data.docId)"><svg-icon src="/assets/icons/copy-left.svg"></svg-icon></button>
 			</td>
 		</tr>
 	</tbody>

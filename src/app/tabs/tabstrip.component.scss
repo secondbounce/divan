@@ -35,16 +35,16 @@
       background: none;
       border: none;
       border-radius: 3px;
+      color: inherit;
       cursor: pointer;
       display: flex;
-      fill: currentColor;
       height: 1.5em;
       justify-content: center;
       padding: 0;
       width: 1.5em;
 
       &:hover {
-        background-color: #00000030;
+        background-color: var(--dv-tab-active-bg-hover);
       }
     }
   }

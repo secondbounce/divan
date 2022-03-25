@@ -20,8 +20,10 @@ button {
   &.icon-button {
     padding: 0.2em;
   }
-  img {
-    flex-shrink: 0;
+  svg-icon {
+    display: flex;  /* Otherwise a gap is left under icon (whitespace in HTML?) */
+  }
+  svg {
     height: $icon-button-img-size;
     min-height: $icon-button-img-size;
     min-width: $icon-button-img-size;
@@ -74,6 +76,7 @@ td {
   background: none;
   border: none;
   border-radius: 3px;
+  color: inherit;
   cursor: pointer;
   display: inline-flex;
   height: 1.5em;

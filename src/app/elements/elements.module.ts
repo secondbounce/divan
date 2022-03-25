@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Injector, NgModule } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AngularSvgIconModule } from 'angular-svg-icon';
 
 import { DatabaseDiffOptionsComponent } from './database-diff-options.component';
 import { MessageBoxComponent } from './message-box.component';
@@ -11,7 +12,8 @@ import { SelectServerComponent } from './select-server.component';
   imports: [
     CommonModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    AngularSvgIconModule
   ],
   exports: [
     DatabaseDiffOptionsComponent,

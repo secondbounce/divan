@@ -3,6 +3,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ApplicationRef, DoBootstrap, Injector, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AngularSvgIconModule } from 'angular-svg-icon';
 import { ToastrModule } from 'ngx-toastr';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -34,6 +35,7 @@ import { UiComponentsModule } from './ui-components/ui-components.module';
     HttpClientModule,
     BrowserAnimationsModule,  // Required for ToastrModule
     ToastrModule.forRoot(ToastService.globalConfig),
+    AngularSvgIconModule.forRoot(),
     AppRoutingModule,
     UiComponentsModule,
     ElementsModule,
