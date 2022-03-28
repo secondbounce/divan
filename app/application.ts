@@ -1,30 +1,30 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { BrowserWindow, BrowserWindowConstructorOptions, ipcMain, Menu, MenuItemConstructorOptions } from 'electron';
+import { App, BrowserWindow, BrowserWindowConstructorOptions, ipcMain, Menu, MenuItemConstructorOptions } from 'electron';
 import log from 'electron-log';
 // TODO: currently getting "Could not find a declaration file for module 'electron-reload'" even though it supposedly supports typings
 // import electronReload from 'electron-reload';
 
 import { ServerCredentials } from '../src/app/core/model';
-import { Channel, MenuCommand, RendererEvent } from '../src/app/enums';
+import { Channel, MenuCommand, MenuId, RendererEvent } from '../src/app/enums';
 import { ElectronEvent } from './enums';
 import { Logger } from './logger';
+import { MenuStateService } from './services/menu-state.service';
 import { RecentlyOpenedService } from './services/recently-opened.service';
 import { AppInfo } from './shared/app-info';
 import { configureLogging } from './shared/log-config';
 import { convertToText } from './shared/string';
 
-const DIFF_DATABASES_MENU_ID: string = 'diff-databases';
-
 export class Application {
   public readonly isMac: boolean;
   private _mainWindow: BrowserWindow | undefined;
+  private _menuStateService: MenuStateService = MenuStateService.instance;
   private _recentlyOpenedService: RecentlyOpenedService = RecentlyOpenedService.instance;
   private _debugMode: boolean;
   private _appInfo: AppInfo;
   private readonly _log: Logger;
 
-  constructor(private _electronApp: Electron.App) {
+  constructor(private _electronApp: App) {
     configureLogging(log);
 
     this._log = new Logger('Application');
@@ -101,32 +101,49 @@ export class Application {
     const recentlyOpenedMenuTemplate: Array<MenuItemConstructorOptions> = this.createRecentlyOpenedMenuTemplate(recentCredentials);
     const template: Array<MenuItemConstructorOptions> = [
       {
+        /* IMPORTANT!  Changing the menus here?  Don't forget to update MenuStateService.disableMainMenu()
+          to account for those changes.
+        */
+        id: MenuId.File,
         label: 'File',
         submenu: [
           {
+            id: MenuId.OpenServer,
             label: 'Open Server...',
             click: (): void => { this.sendMenuCommand(MenuCommand.OpenServer) }
           },
           {
+            id: MenuId.OpenRecent,
             label: 'Open Recent',
             submenu: recentlyOpenedMenuTemplate
           },
           { type: 'separator' },
           {
-            id: DIFF_DATABASES_MENU_ID,
+            id: MenuId.DiffDatabases,
             label: 'Diff Databases',
             enabled: false,
             click: (): void => { this.sendMenuCommand(MenuCommand.DiffDatabases) }
           },
           { type: 'separator' },
-          this.isMac ? { role: 'close' }
-                     : { role: 'quit' }
+          this.isMac ? {
+                        id: MenuId.Exit,
+                        role: 'close'
+                       }
+                     : {
+                        id: MenuId.Exit,
+                        role: 'quit'
+                       }
         ]
+      },
+      {
+        id: MenuId.Edit,
+        role: 'editMenu'
       }
     ];
 
     if (this.isMac) {
       template.unshift({
+                        id: MenuId.Application,
                         label: this._electronApp.name,
                         submenu: [
                           { role: 'about' },
@@ -168,6 +185,27 @@ export class Application {
     return template;
   }
 
+  private setUpContextMenuForEditing(mainWindow: BrowserWindow): void {
+    /* Rather than constructing the edit menu manually, we'll just use the 'editmenu' role to
+      create the required items for us and then use that.
+    */
+    const contextMenu: Menu = Menu.buildFromTemplate([
+      { role: 'editMenu' }
+    ]);
+    const editMenu: Menu | undefined = contextMenu.items[0].submenu;
+
+    if (editMenu) {
+      mainWindow.webContents.on(ElectronEvent.ContextMenu, (_e, props) => {
+        const { selectionText, isEditable } = props;
+
+        if ((selectionText && selectionText.length > 0) || isEditable) {
+          this._menuStateService.setEditMenuItemsState(editMenu, props);
+          editMenu.popup({ window: mainWindow });
+        }
+      });
+    }
+  }
+
   private getBrowserAppUrl(): string {
     let appUrl: string;
 
@@ -202,6 +240,7 @@ export class Application {
 
     this._mainWindow = mainWindow;
     this._mainWindow.webContents.send(Channel.AppInfo, this._appInfo);
+    this.setUpContextMenuForEditing(mainWindow);
 
     if (this._debugMode) {
       mainWindow.webContents.openDevTools();
@@ -218,6 +257,14 @@ export class Application {
     const event: RendererEvent = args[0];
 
     switch (event) {
+      case RendererEvent.ModalOpened:
+        this.onModalOpened();
+        break;
+
+      case RendererEvent.ModalClosed:
+        this.onModalClosed();
+        break;
+
       case RendererEvent.ServerOpened: {
         const credentials: ServerCredentials | undefined = args.length > 1 ? args[1] : undefined;
         if (credentials) {
@@ -235,13 +282,17 @@ export class Application {
     }
   };
 
+  private onModalOpened(): void {
+    this._menuStateService.disableMainMenu();
+  }
+
+  private onModalClosed(): void {
+    this._menuStateService.reenableMainMenu();
+  }
+
   private onServerOpened = (credentials: ServerCredentials): void => {
     this._recentlyOpenedService.add(credentials);
-
-    const diffDatabasesMenuItem: Electron.MenuItem | null | undefined = Menu.getApplicationMenu()?.getMenuItemById(DIFF_DATABASES_MENU_ID);
-    if (diffDatabasesMenuItem) {
-      diffDatabasesMenuItem.enabled = true;
-    }
+    this._menuStateService.setMenuItemState(MenuId.DiffDatabases, true);
   };
 
   private onElectronActivate = (): void => {

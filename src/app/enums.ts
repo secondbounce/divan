@@ -20,7 +20,19 @@ export const enum MenuCommand {
   DiffDatabases = 'diff-databases'
 }
 
+export const enum MenuId {
+  File = 'file',
+    OpenServer = 'open-server',
+    OpenRecent = 'open-recent',
+    DiffDatabases = 'diff-databases',
+    Exit = 'exit',
+  Edit = 'edit',
+  Application = 'application'
+}
+
 export const enum RendererEvent {
+  ModalClosed = 'modal-closed',
+  ModalOpened = 'modal-opened',
   ServerOpened = 'server-opened'
 }
 

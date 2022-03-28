@@ -1,11 +1,15 @@
 import { Injectable } from '@angular/core';
 import { NgElement, WithProperties } from '@angular/elements';
-import { first, fromEvent, map, Observable } from 'rxjs';
+import { finalize, first, fromEvent, map, Observable } from 'rxjs';
 
+import { RendererEvent } from '../enums';
 import { ModalComponent, ModalResult } from '../ui-components';
+import { ElectronService } from './electron.service';
 
 @Injectable()
 export class ModalService {
+  constructor(private _electronService: ElectronService) {}
+
 // TODO: save the elementTags when we define them, so they don't have to be passed here
   public show<ModalType extends ModalComponent>(elementTag: string,
                                                 properties?: { [key: string]: any }): Observable<ModalResult> {
@@ -23,8 +27,12 @@ export class ModalService {
                                                       map(event => {
                                                         document.body.removeChild(modal);
                                                         return (event as CustomEvent).detail;
+                                                      }),
+                                                      finalize(() => {
+                                                        this._electronService.emitRendererEvent(RendererEvent.ModalClosed);
                                                       }));
     document.body.appendChild(modal);
+    this._electronService.emitRendererEvent(RendererEvent.ModalOpened);
 
     return closed$;
   }
