@@ -3,7 +3,7 @@
 	<summary [attr.aria-label]="this.title">
 		{{ this.title }}
 		<button type="button" [value]="this.cancelValue" [attr.data-button-id]="this.cancelId" title="Close" class="close-button" (click)="onClick($event)">
-			<svg-icon src="/assets/icons/close.svg"></svg-icon>
+			<svg-icon src="assets/icons/close.svg"></svg-icon>
 		</button>
 	</summary>
 	<div [innerHTML]="this.message"></div>

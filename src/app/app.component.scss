@@ -1,6 +1,7 @@
 @import 'variables';
 
 :host {
+  border-block-start: solid 1px var(--dv-default-border-color);   /* So there's a line between the window's menu bar and the content */
   display: grid;
   grid-template-areas: "main-menu tabstrip"
                        "main-menu content";
