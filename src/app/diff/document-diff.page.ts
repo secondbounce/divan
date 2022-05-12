@@ -6,11 +6,10 @@ import { forkJoin, Observable } from 'rxjs';
 import { convertToText } from '~shared/string';
 import { DesignDocument, Document } from '../core/couchdb';
 import { Logger, LogService } from '../core/logging';
-import { DatabaseCredentials, ServerCredentials } from '../core/model';
+import { DatabaseCredentials, DocDiffOptions, ServerCredentials } from '../core/model';
 import { ResultStatus } from '../enums';
 import { ContentSanitizerService, DialogService, DocumentService, ServerService, ToastService } from '../services';
 import { TabPanelComponent } from '../tabs';
-import { DocDiffOptions } from './doc-diff-options';
 
 const ZERO_WIDTH_SPACE: string = '\u200B';
 const DIFF_PANEL_GAP: number = 5;

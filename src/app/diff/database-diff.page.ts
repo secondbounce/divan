@@ -3,15 +3,13 @@ import { forkJoin, Observable } from 'rxjs';
 
 import { Database, DESIGN_DOC_ID_PREFIX, DesignDocument } from '../core/couchdb';
 import { Logger, LogService } from '../core/logging';
-import { DatabaseCredentials, ServerCredentials } from '../core/model';
+import { DatabaseCredentials, DbDiffOptions, DocDiffOptions, ServerCredentials } from '../core/model';
 import { DatabaseDiffOptionsComponent } from '../elements';
 import { CompareResult, ResultStatus } from '../enums';
 import { CouchDbExportService, DialogService, DocumentService, ModalService, ServerService, TabManagerService, ToastService } from '../services';
 import { TabPanel, TabPanelComponent } from '../tabs';
 import { ModalResult } from '../ui-components';
 import { isEqualStringArrays } from '../utility';
-import { DbDiffOptions } from './db-diff-options';
-import { DocDiffOptions } from './doc-diff-options';
 import { DocumentDiffPage } from './document-diff.page';
 
 interface DocComparisonData {

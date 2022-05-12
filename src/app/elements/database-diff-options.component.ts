@@ -3,8 +3,7 @@ import { AbstractControl, FormBuilder, FormControl, Validators } from '@angular/
 import { catchError, map, Observable, of, takeUntil } from 'rxjs';
 
 import { Logger, LogService } from '../core/logging';
-import { ServerCredentials } from '../core/model';
-import { DbDiffOptions } from '../diff';
+import { DbDiffOptions, ServerCredentials } from '../core/model';
 import { ServerService, ToastService } from '../services';
 import { ModalComponent } from '../ui-components';
 
