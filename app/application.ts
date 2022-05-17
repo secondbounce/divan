@@ -1,9 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { App, BrowserWindow, BrowserWindowConstructorOptions, ipcMain, Menu, MenuItemConstructorOptions } from 'electron';
+import debug from 'electron-debug';
 import log from 'electron-log';
-// TODO: currently getting "Could not find a declaration file for module 'electron-reload'" even though it supposedly supports typings
-// import electronReload from 'electron-reload';
+import reloader from 'electron-reloader';
 
 import { ServerCredentials } from '../src/app/core/model';
 import { Channel, MenuCommand, MenuId, RendererEvent } from '../src/app/enums';
@@ -210,9 +210,8 @@ export class Application {
     let appUrl: string;
 
     if (this._debugMode) {
-      // electronReload(__dirname, {
-      //   electron: require(path.join(__dirname, '/../node_modules/electron'))
-      // });
+      debug();
+      reloader(module);
 
       appUrl = 'http://localhost:4200';
     } else {

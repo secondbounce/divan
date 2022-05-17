@@ -2,6 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "allowJs": true,
+    "allowSyntheticDefaultImports": true,  // Needed for electron-debug & electron-reloader
     "baseUrl": ".",
     "declaration": false,
     "downlevelIteration": true,    // Required to avoid "Type 'IterableIterator<...>' is not an array type or a string type" for Map.values()

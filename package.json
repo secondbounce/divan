@@ -75,9 +75,10 @@
     "@typescript-eslint/eslint-plugin": "~5.21.0",
     "@typescript-eslint/parser": "~5.21.0",
     "conventional-changelog-cli": "~2.2.2",
-    "electron": "~16.2.3",
+    "electron": "~18.2.3",
     "electron-builder": "~23.0.3",
-    "electron-reload": "~1.5.0",
+    "electron-debug": "~3.2.0",
+    "electron-reloader": "~1.2.3",
     "eslint": "~8.14.0",
     "eslint-plugin-import": "~2.26.0",
     "eslint-plugin-jsdoc": "~39.2.9",
@@ -102,6 +103,6 @@
     "node": ">=14.0.0"
   },
   "browserslist": [
-    "chrome 91"
+    "chrome 100"
   ]
 }
