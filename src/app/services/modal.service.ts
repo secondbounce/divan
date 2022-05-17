@@ -6,7 +6,9 @@ import { RendererEvent } from '../enums';
 import { ModalComponent, ModalResult } from '../ui-components';
 import { ElectronService } from './electron.service';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ModalService {
   constructor(private _electronService: ElectronService) {}
 

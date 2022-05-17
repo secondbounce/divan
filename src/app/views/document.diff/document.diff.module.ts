@@ -2,8 +2,9 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 
-import { DatabaseDiffPage } from './database-diff.page';
 import { DocumentDiffPage } from './document-diff.page';
+
+export { DocumentDiffPage } from './document-diff.page';
 
 @NgModule({
   imports: [
@@ -11,13 +12,11 @@ import { DocumentDiffPage } from './document-diff.page';
     AngularSvgIconModule
   ],
   exports: [
-    DatabaseDiffPage,
     DocumentDiffPage
   ],
   declarations: [
-    DatabaseDiffPage,
     DocumentDiffPage
   ],
   providers: []
 })
-export class DiffModule {}
+export class DocumentDiffModule {}

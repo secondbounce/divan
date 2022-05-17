@@ -1,8 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
-import { Logger, LogService } from '../core/logging';
-import { Server } from '../core/model';
-import { ServerService, ToastService } from '../services';
+import { Logger, Server } from '../../core/model';
+import { LogService, ServerService, ToastService } from '../../services';
 
 @Component({
   selector: 'app-server-list',

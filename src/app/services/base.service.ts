@@ -2,10 +2,9 @@ import { HttpErrorResponse, HttpHeaders, HttpStatusCode } from '@angular/common/
 import { Injectable, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 
-import { Logger } from '../core/logging';
-import { LogService } from '../core/logging/log.service';
-import { ServerCredentials } from '../core/model';
+import { Logger, ServerCredentials } from '../core/model';
 import { getAuthorizationHeader } from '../utility';
+import { LogService } from './log.service';
 
 @Injectable()
 export abstract class BaseService implements OnDestroy {

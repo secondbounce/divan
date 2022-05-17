@@ -4,12 +4,11 @@ import { Change, diffChars, diffLines } from 'diff';
 import { forkJoin, Observable } from 'rxjs';
 
 import { convertToText } from '~shared/string';
-import { DesignDocument, Document } from '../core/couchdb';
-import { Logger, LogService } from '../core/logging';
-import { DatabaseCredentials, DocDiffOptions, ServerCredentials } from '../core/model';
-import { ResultStatus } from '../enums';
-import { ContentSanitizerService, DialogService, DocumentService, ServerService, ToastService } from '../services';
-import { TabPanelComponent } from '../tabs';
+import { DesignDocument, Document } from '../../core/couchdb';
+import { DatabaseCredentials, DocDiffOptions, Logger, ServerCredentials } from '../../core/model';
+import { ResultStatus } from '../../enums';
+import { ContentSanitizerService, DialogService, DocumentService, LogService, ServerService, ToastService } from '../../services';
+import { TabPanelComponent } from '../../tabs';
 
 const ZERO_WIDTH_SPACE: string = '\u200B';
 const DIFF_PANEL_GAP: number = 5;

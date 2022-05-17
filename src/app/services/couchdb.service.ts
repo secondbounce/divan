@@ -3,10 +3,12 @@ import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of } from 'rxjs';
 
 import { DesignDocQueryParams, DocInfo, DocResponse } from '../core/couchdb';
-import { LogService } from '../core/logging';
 import { BaseService } from './base.service';
+import { LogService } from './log.service';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class CouchDbService extends BaseService {
   constructor(private _http: HttpClient,
               logService: LogService) {

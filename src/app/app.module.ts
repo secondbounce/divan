@@ -6,24 +6,27 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { ToastrModule } from 'ngx-toastr';
 
-import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { LogService } from './core/logging';
-import { DiffModule } from './diff/diff.module';
-import { ElementsModule } from './elements/elements.module';
-import { ServersModule } from './servers/servers.module';
-import { ContentSanitizerService,
-         CouchDbExportService,
-         CouchDbService,
-         DialogService,
-         DocumentService,
-         ElectronService,
-         ModalService,
-         ServerService,
-         ToastService
+import {
+        ContentSanitizerService,
+        CouchDbExportService,
+        CouchDbService,
+        DialogService,
+        DocumentService,
+        ElectronService,
+        LogService,
+        ModalService,
+        ServerService,
+        TabManagerService,
+        ToastService
        } from './services';
-import { TabsModule } from './tabs/tabs.module';
-import { UiComponentsModule } from './ui-components/ui-components.module';
+import { TabPanelsModule } from './tabs/tab-panels/tab-panels.module';
+import { TabstripModule } from './tabs/tabstrip/tabstrip.module';
+import { DatabaseDiffOptionsModule } from './views/database-diff-options/database-diff-options.module';
+import { DatabaseDiffModule } from './views/database-diff/database-diff.module';
+import { MessageBoxModule } from './views/message-box/message-box.module';
+import { SelectServerModule } from './views/select-server/select-server.module';
+import { ServerListModule } from './views/server-list/server-list.module';
 
 @NgModule({
   declarations: [
@@ -36,12 +39,13 @@ import { UiComponentsModule } from './ui-components/ui-components.module';
     BrowserAnimationsModule,  // Required for ToastrModule
     ToastrModule.forRoot(ToastService.globalConfig),
     AngularSvgIconModule.forRoot(),
-    AppRoutingModule,
-    UiComponentsModule,
-    ElementsModule,
-    TabsModule,
-    DiffModule,
-    ServersModule
+    DatabaseDiffModule,
+    DatabaseDiffOptionsModule,
+    MessageBoxModule,
+    SelectServerModule,
+    ServerListModule,
+    TabPanelsModule,
+    TabstripModule
   ],
   providers: [
     ContentSanitizerService,
@@ -53,6 +57,7 @@ import { UiComponentsModule } from './ui-components/ui-components.module';
     LogService,
     ModalService,
     ServerService,
+    TabManagerService,
     ToastService
   ],
   bootstrap: [/* See below */]
@@ -67,6 +72,8 @@ export class AppModule implements DoBootstrap {
     */
     appRef.bootstrap(AppComponent);
 
-    ElementsModule.define(this._injector);
+    DatabaseDiffOptionsModule.define(this._injector);
+    MessageBoxModule.define(this._injector);
+    SelectServerModule.define(this._injector);
   }
 }

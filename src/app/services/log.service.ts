@@ -2,10 +2,12 @@ import { Injectable } from '@angular/core';
 import log from 'electron-log';
 
 import { configureLogging } from '~shared/log-config';
-import { isElectron } from '../../utility';
-import { Logger } from './logger';
+import { Logger } from '../core/model';
+import { isElectron } from '../utility';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class LogService {
   private _loggers: { [key: string]: Logger } = {};
   private _electronLog: typeof log | undefined;

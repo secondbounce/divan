@@ -1,8 +1,8 @@
 import { AfterViewChecked, Component, ElementRef, HostListener } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 
-import { TabManagerService } from '../services';
-import { TabItem } from './tab-item';
+import { TabManagerService } from '../../services';
+import { TabItem } from '../tab-item';
 
 const SCROLL_FACTOR: number = 0.5;
 

@@ -2,10 +2,11 @@ import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, Validators } from '@angular/forms';
 
-import { Logger, LogService } from '../core/logging';
-import { ServerCredentials } from '../core/model';
-import { ServerService, ToastService } from '../services';
-import { ModalComponent } from '../ui-components';
+import { Logger, ServerCredentials } from '../../core/model';
+import { LogService, ServerService, ToastService } from '../../services';
+import { ModalComponent } from '../../ui-components';
+
+// TODO: display progress bar somewhere (if server not available, timeout creates a delay, so need to stop user clicking again, etc)
 
 @Component({
   selector: 'app-select-server',
@@ -37,7 +38,7 @@ export class SelectServerComponent extends ModalComponent implements OnInit {
     this.formGroup = this._formBuilder.group({
       alias: [this._credentials.alias],
       address: [this._credentials.address, [Validators.required,
-// TODO: sort out regex
+// TODO: sort out regex (is this needed if type="url"? yes, we use it if it fails to create a URL below)
                                             Validators.pattern('.*')
                                            ]],
       username: [this._credentials.username, [Validators.required]],

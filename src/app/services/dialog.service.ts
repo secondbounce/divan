@@ -1,21 +1,25 @@
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable } from 'rxjs';
 
-import { LogService } from '../core/logging';
-import { MessageBoxComponent, MessageBoxOptions } from '../elements';
+import { MessageBoxComponent, MessageBoxOptions } from '../views/message-box/message-box.module';
 import { BaseService } from './base.service';
+import { ElectronService } from './electron.service';
+import { LogService } from './log.service';
 import { ModalService } from './modal.service';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class DialogService extends BaseService {
   constructor(private _modalService: ModalService,
+              private _electronService: ElectronService,
               logService: LogService) {
     super(logService);
   }
 
   public showYesNoMessageBox(message: string, title?: string): Observable<boolean> {
     const options: MessageBoxOptions = {
-      title,
+      title: title ?? this._electronService.appName,
       message,
       buttons: [
         {

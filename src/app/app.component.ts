@@ -2,15 +2,14 @@ import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 
 import { convertToText } from '~shared/string';
 import { environment } from '../environments/environment';
-import { Logger, LogService } from './core/logging';
-import { DbDiffOptions, Server, ServerCredentials } from './core/model';
-import { DatabaseDiffPage } from './diff';
-import { DatabaseDiffOptionsComponent, SelectServerComponent } from './elements';
+import { DbDiffOptions, Logger, Server, ServerCredentials } from './core/model';
 import { Channel, MenuCommand, RendererEvent } from './enums';
-import { ServerListComponent } from './servers';
-import { ElectronService, ModalService, TabManagerService, ToastService } from './services';
-import { TabPanel } from './tabs/tab-panel';
+import { ElectronService, LogService, ModalService, TabManagerService, ToastService } from './services';
 import { ModalResult } from './ui-components';
+import { DatabaseDiffOptionsComponent } from './views/database-diff-options/database-diff-options.module';
+import { DatabaseDiffPage } from './views/database-diff/database-diff.module';
+import { SelectServerComponent } from './views/select-server/select-server.module';
+import { ServerListComponent } from './views/server-list/server-list.module';
 
 @Component({
   selector: 'app-root',
@@ -83,8 +82,7 @@ export class AppComponent {
                         next: (result: ModalResult) => {
                           if (result.ok) {
                             const options: DbDiffOptions = result.data as DbDiffOptions;
-                            const tabPanel: TabPanel = new TabPanel(DatabaseDiffPage, options);
-                            this._tabManagerService.open(tabPanel);
+                            this._tabManagerService.open(DatabaseDiffPage, options);
                           }
                         },
                         error: (error: any) => {

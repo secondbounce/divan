@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { ContentSanitizerService, ElectronService } from '../services';
 
-import { ModalComponent } from '../ui-components';
+import { ContentSanitizerService } from '../../services';
+import { ModalComponent } from '../../ui-components';
 
 export interface MessageBoxButton {
   label: string;
@@ -34,10 +34,8 @@ export class MessageBoxComponent extends ModalComponent {
     buttons: []
   };
 
-  constructor(private _contentSanitizerService: ContentSanitizerService,
-              electronService: ElectronService) {
+  constructor(private _contentSanitizerService: ContentSanitizerService) {
     super();
-    this._title = electronService.appName;
   }
 
   public get title(): string {

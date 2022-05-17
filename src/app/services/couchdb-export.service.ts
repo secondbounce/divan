@@ -4,12 +4,12 @@ import { forkJoin, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { Database, DbInfo, DESIGN_DOC_ID_PREFIX, DesignDocument, Document, Security } from '../core/couchdb';
-import { LogService } from '../core/logging';
 import { DatabaseCredentials, ServerCredentials } from '../core/model';
 import { getAuthorizationHeader } from '../utility';
 import { BaseService } from './base.service';
 import { CouchDbService } from './couchdb.service';
 import { DocumentService } from './document.service';
+import { LogService } from './log.service';
 
 // TODO: rename to something clearer
 const enum ValuesIndex {
@@ -21,7 +21,9 @@ const enum ValuesIndex {
   /* eslint-enable @typescript-eslint/no-shadow */
 }
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class CouchDbExportService extends BaseService {
   constructor(private _documentService: DocumentService,
               private _couchDbService: CouchDbService,

@@ -3,11 +3,11 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { map, Observable, ReplaySubject } from 'rxjs';
 
 import { ServerMetaInfo } from '../core/couchdb';
-import { LogService } from '../core/logging';
 import { Server, ServerCredentials } from '../core/model';
 import { getAuthorizationHeader } from '../utility';
 import { BaseService } from './base.service';
 import { CouchDbService } from './couchdb.service';
+import { LogService } from './log.service';
 
 @Injectable({
   providedIn: 'root'

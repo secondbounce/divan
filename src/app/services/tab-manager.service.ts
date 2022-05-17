@@ -1,12 +1,11 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Type } from '@angular/core';
 import { Observable, ReplaySubject, takeUntil } from 'rxjs';
-import { ARRAY_LAST_ITEM_INDEX } from '../constants';
 
-import { LogService } from '../core/logging';
-import { TabItem } from '../tabs';
-import { TabPanel } from '../tabs/tab-panel';
+import { ARRAY_LAST_ITEM_INDEX } from '../constants';
+import { TabItem, TabPanel, TabPanelComponent } from '../tabs';
 import { removeFromArray } from '../utility';
 import { BaseService } from './base.service';
+import { LogService } from './log.service';
 
 @Injectable({
   providedIn: 'root'
@@ -41,7 +40,8 @@ export class TabManagerService extends BaseService {
     this._closeTabHandler = handler;
   }
 
-  public open(tabPanel: TabPanel): void {
+  public open(component: Type<TabPanelComponent<any>>, data: any): void {
+    const tabPanel: TabPanel = new TabPanel(component, data);
     const key: string = tabPanel.key;
 
     /* Need to add to map first since title change handler relies on it being available */

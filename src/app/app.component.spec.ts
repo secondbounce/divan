@@ -2,8 +2,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 
 import { AppComponent } from './app.component';
-import { LogService } from './core/logging';
-import { ElectronService, ModalService } from './services';
+import { ElectronService, LogService, ModalService } from './services';
 
 describe('AppComponent', () => {
   beforeEach(waitForAsync(() => {

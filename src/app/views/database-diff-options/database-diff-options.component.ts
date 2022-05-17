@@ -2,10 +2,9 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } 
 import { AbstractControl, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { catchError, map, Observable, of, takeUntil } from 'rxjs';
 
-import { Logger, LogService } from '../core/logging';
-import { DbDiffOptions, ServerCredentials } from '../core/model';
-import { ServerService, ToastService } from '../services';
-import { ModalComponent } from '../ui-components';
+import { DbDiffOptions, Logger, ServerCredentials } from '../../core/model';
+import { LogService, ServerService, ToastService } from '../../services';
+import { ModalComponent } from '../../ui-components';
 
 // TODO: if no available servers, should display 'empty state' warning and close the form
 
