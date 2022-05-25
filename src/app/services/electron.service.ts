@@ -7,8 +7,10 @@ import { Injectable } from '@angular/core';
 import { ipcRenderer, webFrame } from 'electron';
 
 import { AppInfo } from '~shared/app-info';
+import { Logger } from '../core/model';
 import { Channel, RendererEvent } from '../enums';
 import { isElectron } from '../utility';
+import { LogService } from './log.service';
 
 @Injectable({
   providedIn: 'root'
@@ -21,8 +23,11 @@ export class ElectronService {
   private _appInfo: AppInfo = {
     appName: 'Divan'  /* Default if running in browsers */
   };
+  private readonly _log: Logger;
 
-  constructor() {
+  constructor(logService: LogService) {
+    this._log = logService.getLogger('ElectronService');
+
     if (isElectron()) {
       this._ipcRenderer = window.require('electron').ipcRenderer;
       this.webFrame = window.require('electron').webFrame;
@@ -45,7 +50,7 @@ export class ElectronService {
                           this._appInfo = args[0];
                         });
     } else {
-// TODO: log this!
+      this._log.warn('ElectronService instantiated in non-Electron environment');
     }
   }
 
@@ -57,7 +62,7 @@ export class ElectronService {
     this._ipcRenderer?.on(channel, (_event, ...args) => listener(...args));
   }
 
-  public emitRendererEvent(event: RendererEvent, args?: any): void {
-    this._ipcRenderer?.send(Channel.RendererEvent, event, args);
+  public emitRendererEvent(event: RendererEvent, ...args: any[]): void {
+    this._ipcRenderer?.send(Channel.RendererEvent, event, ...args);
   }
 }
