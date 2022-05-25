@@ -33,7 +33,7 @@ export class MenuStateService {
       let submenu: Menu | undefined = this.getMenuItem(mainMenu, MenuId.File).submenu;
       if (submenu) {
         for (const menuItem of submenu.items) {
-          if (menuItem.id !== MenuId.Exit) {
+          if (menuItem.id !== MenuId.FileExit) {
             this.disableMenuItem(menuItem);
           }
         }

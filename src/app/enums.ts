@@ -22,18 +22,20 @@ export const enum MenuCommand {
 
 export const enum MenuId {
   File = 'file',
-    OpenServer = 'open-server',
-    OpenRecent = 'open-recent',
-    DiffDatabases = 'diff-databases',
-    Exit = 'exit',
+    FileOpenServer = 'file_open-server',
+    FileOpenRecent = 'file_open-recent',
+    FileDiffDatabases = 'file_diff-databases',
+    FileExit = 'file_exit',
   Edit = 'edit',
-  Application = 'application'
+  Application = 'application',
+  DatabaseDiff = 'database_diff'
 }
 
 export const enum RendererEvent {
   ModalClosed = 'modal-closed',
   ModalOpened = 'modal-opened',
-  ServerOpened = 'server-opened'
+  ServerOpened = 'server-opened',
+  ShowDatabaseContextMenu = 'show-database-context-menu'
 }
 
 export const enum ResultStatus {

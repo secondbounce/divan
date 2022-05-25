@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RendererEvent } from 'src/app/enums';
 
 import { Logger, Server } from '../../core/model';
-import { LogService, ServerService, ToastService } from '../../services';
+import { ElectronService, LogService, ServerService, ToastService } from '../../services';
 
 @Component({
   selector: 'app-server-list',
@@ -14,6 +15,7 @@ export class ServerListComponent {
   private readonly _log: Logger;
 
   constructor(private _serverService: ServerService,
+              private _electronService: ElectronService,
               private _toastService: ToastService,
               logService: LogService) {
     this._log = logService.getLogger('AppComponent');
@@ -21,6 +23,11 @@ export class ServerListComponent {
 
   public addServer(server: Server): void {
     this.servers.push(server);
+  }
+
+  public onContextMenuDatabase($event: MouseEvent, serverAlias: string, database: string): void {
+    $event.preventDefault();  /* Stop browser displaying its context menu */
+    this._electronService.emitRendererEvent(RendererEvent.ShowDatabaseContextMenu, serverAlias, database);
   }
 
   public onTogglingDatabases($event: Event, server: Server): void {

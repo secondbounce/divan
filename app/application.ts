@@ -106,29 +106,29 @@ export class Application {
         label: 'File',
         submenu: [
           {
-            id: MenuId.OpenServer,
+            id: MenuId.FileOpenServer,
             label: 'Open Server...',
             click: (): void => { this.sendMenuCommand(MenuCommand.OpenServer) }
           },
           {
-            id: MenuId.OpenRecent,
+            id: MenuId.FileOpenRecent,
             label: 'Open Recent',
             submenu: recentlyOpenedMenuTemplate
           },
           { type: 'separator' },
           {
-            id: MenuId.DiffDatabases,
-            label: 'Diff Databases',
+            id: MenuId.FileDiffDatabases,
+            label: 'Diff Databases...',
             enabled: false,
             click: (): void => { this.sendMenuCommand(MenuCommand.DiffDatabases) }
           },
           { type: 'separator' },
           this.isMac ? {
-                        id: MenuId.Exit,
+                        id: MenuId.FileExit,
                         role: 'close'
                        }
                      : {
-                        id: MenuId.Exit,
+                        id: MenuId.FileExit,
                         role: 'quit'
                        }
         ]
@@ -260,11 +260,21 @@ export class Application {
         break;
 
       case RendererEvent.ServerOpened: {
-        const credentials: ServerCredentials | undefined = args.length > 1 ? args[1] : undefined;
+        const [, credentials] = args;
         if (credentials) {
           this.onServerOpened(credentials);
         } else {
           this._log.error('\'ServerOpened\' renderer event received without credentials');
+// TODO: need to display the error message somehow
+        }
+        break;
+      }
+      case RendererEvent.ShowDatabaseContextMenu: {
+        const [, serverAlias, database] = args;
+        if (serverAlias && database) {
+          this.onShowDatabaseContextMenu(serverAlias, database);
+        } else {
+          this._log.error('\'ShowDatabaseContextMenu\' renderer event received without serverAlias/database');
 // TODO: need to display the error message somehow
         }
         break;
@@ -286,8 +296,20 @@ export class Application {
 
   private onServerOpened = (credentials: ServerCredentials): void => {
     this._recentlyOpenedService.add(credentials);
-    this._menuStateService.setMenuItemState(MenuId.DiffDatabases, true);
+    this._menuStateService.setMenuItemState(MenuId.FileDiffDatabases, true);
   };
+
+  private onShowDatabaseContextMenu(serverAlias: string, database: string): void {
+    const contextMenu: Menu = Menu.buildFromTemplate([
+      {
+        id: MenuId.DatabaseDiff,
+        label: 'Diff...',
+        click: (): void => { this.sendMenuCommand(MenuCommand.DiffDatabases, serverAlias, database) }
+      }
+    ]);
+
+    contextMenu.popup({ window: this._mainWindow });
+  }
 
   private onElectronActivate = (): void => {
     /* On OS X, it's common to re-create a window in the app when the

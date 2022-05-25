@@ -37,14 +37,15 @@ export class AppComponent {
 
     switch (menuCommand) {
       case MenuCommand.OpenServer: {
-        const credentials: ServerCredentials | undefined = args.length > 1 ? args[1] : undefined;
+        const [, credentials] = args;
         this.openServer(credentials);
         break;
       }
-      case MenuCommand.DiffDatabases:
-        this.diffDatabases();
+      case MenuCommand.DiffDatabases: {
+        const [, serverAlias, database] = args;
+        this.diffDatabases(serverAlias, database);
         break;
-
+      }
       default:
         this._log.error(`Unsupported MenuCommand - ${convertToText(menuCommand)}`);
         break;
@@ -76,12 +77,20 @@ export class AppComponent {
                       });
   }
 
-  private diffDatabases(): void {
-    this._modalService.show<DatabaseDiffOptionsComponent>(DatabaseDiffOptionsComponent.elementTag)
+  private diffDatabases(serverAlias: string | undefined, database: string | undefined): void {
+    let options: DbDiffOptions = {
+      sourceAlias: serverAlias ?? '',
+      sourceDb: database ?? '',
+      targetAlias: '',
+      targetDb: ''
+    };
+
+    this._modalService.show<DatabaseDiffOptionsComponent>(DatabaseDiffOptionsComponent.elementTag,
+                                                          { options })
                       .subscribe({
                         next: (result: ModalResult) => {
                           if (result.ok) {
-                            const options: DbDiffOptions = result.data as DbDiffOptions;
+                            options = result.data as DbDiffOptions;
                             this._tabManagerService.open(DatabaseDiffPage, options);
                           }
                         },

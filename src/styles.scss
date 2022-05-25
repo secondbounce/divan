@@ -10,12 +10,6 @@ body {
   font-size: 9pt;
 }
 
-details {
-  > :not(summary) {
-    margin-inline-start: 1em;
-  }
-}
-
 button {
   &.icon-button {
     padding: 0.2em;

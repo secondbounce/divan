@@ -1,7 +1,7 @@
 <details *ngFor="let server of this.servers">
 	<summary [title]="server.address">{{ server.alias }}</summary>
 	<details (toggle)="onTogglingDatabases($event, server)">
-		<summary>Databases</summary>
-		<div *ngFor="let database of this.server.databases" [title]="database">{{ database }}</div>
+		<summary><span>Databases</span></summary>
+		<div *ngFor="let database of this.server.databases" [title]="database" (contextmenu)="onContextMenuDatabase($event, server.alias, database)">{{ database }}</div>
 	</details>
 </details>
