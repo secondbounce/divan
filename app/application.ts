@@ -1,9 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { App, BrowserWindow, BrowserWindowConstructorOptions, ipcMain, Menu, MenuItemConstructorOptions } from 'electron';
-import debug from 'electron-debug';
 import log from 'electron-log';
-import reloader from 'electron-reloader';
 
 import { ServerCredentials } from '../src/app/core/model';
 import { Channel, MenuCommand, MenuId, RendererEvent } from '../src/app/enums';
@@ -210,9 +208,6 @@ export class Application {
     let appUrl: string;
 
     if (this._debugMode) {
-      debug();
-      reloader(module);
-
       appUrl = 'http://localhost:4200';
     } else {
       let pathIndex: string = './index.html';    // Path when running electron executable

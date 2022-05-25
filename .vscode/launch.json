@@ -22,7 +22,6 @@
       "name": "Main",
       "type": "node",
       "request": "launch",
-      "protocol": "inspector",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
       "trace": true,
@@ -34,6 +33,7 @@
       "windows": {
         "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
       },
+      "outputCapture": "std",
       "preLaunchTask": "Build.Main"
     }
   ],

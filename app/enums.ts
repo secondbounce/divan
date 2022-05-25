@@ -3,5 +3,6 @@ export const enum ElectronEvent {
   BeforeQuit = 'before-quit',
   Closed = 'closed',
   ContextMenu = 'context-menu',
+  Ready = 'ready',
   WindowAllClosed = 'window-all-closed'
 }
