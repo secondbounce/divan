@@ -110,10 +110,12 @@ export class DatabaseDiffPage extends TabPanelComponent<DbDiffOptions> implement
     if (this.data && this._sourceCredentials && this._targetCredentials) {
       const sourceDb: Observable<Database> = this._couchDbExportService.exportDatabase(this._sourceCredentials,
                                                                                        this.data.sourceDb,
-                                                                                       false);
+                                                                                       false,
+                                                                                       true);
       const targetDb: Observable<Database> = this._couchDbExportService.exportDatabase(this._targetCredentials,
                                                                                        this.data.targetDb,
-                                                                                       false);
+                                                                                       false,
+                                                                                       true);
 
       forkJoin([sourceDb,
                 targetDb

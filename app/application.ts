@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { App, BrowserWindow, BrowserWindowConstructorOptions, ipcMain, Menu, MenuItemConstructorOptions } from 'electron';
+import { App, BrowserWindow, BrowserWindowConstructorOptions, dialog, ipcMain, Menu, MenuItemConstructorOptions, SaveDialogSyncOptions } from 'electron';
 import log from 'electron-log';
 
 import { ServerCredentials } from '../src/app/core/model';
@@ -279,6 +279,16 @@ export class Application {
         }
         break;
       }
+      case RendererEvent.ShowSaveDialog: {
+        const [, content, options] = args;
+        if (content && options) {
+          this.onShowSaveDialog(content, options);
+        } else {
+          this._log.error('\'ShowSaveDialog\' renderer event received without content/options');
+// TODO: need to display the error message somehow
+        }
+        break;
+      }
       default:
         this._log.error(`Unsupported RendererEvent - ${convertToText(args)}`);
 // TODO: need to display the error message somehow
@@ -305,10 +315,30 @@ export class Application {
         id: MenuId.DatabaseDiff,
         label: 'Diff...',
         click: (): void => { this.sendMenuCommand(MenuCommand.DiffDatabases, serverAlias, database) }
+      },
+      {
+        id: MenuId.ExportDatabase,
+        label: 'Export',
+        click: (): void => { this.sendMenuCommand(MenuCommand.ExportDatabase, serverAlias, database) }
       }
     ]);
 
     contextMenu.popup({ window: this._mainWindow });
+  }
+
+  private onShowSaveDialog(content: string, options: SaveDialogSyncOptions): void {
+    if (this._mainWindow) {
+      const filepath: string | undefined = dialog.showSaveDialogSync(this._mainWindow, options);
+      if (filepath) {
+        try {
+          fs.writeFileSync(filepath, content);
+// TODO: need to display confirmation message
+        } catch (err) {
+          this._log.error(`Failed to save content to '${filepath}'`, err);
+// TODO: need to display the error message somehow
+        }
+      }
+    }
   }
 
   private onElectronActivate = (): void => {

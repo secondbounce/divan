@@ -1,0 +1,17 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.toolbar {
+  border-bottom: var(--dv-default-border-color) solid 0.1px;
+}
+
+article {
+  flex-grow: 1;
+  font-family: monospace;
+  overflow: auto;
+  padding: 1em;
+  white-space: nowrap;
+}

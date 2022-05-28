@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
+import { FileFilter, SaveDialogSyncOptions } from 'electron';
 import { catchError, map, Observable } from 'rxjs';
+import { RendererEvent } from '../enums';
 
 import { MessageBoxComponent, MessageBoxOptions } from '../views/message-box/message-box.module';
 import { BaseService } from './base.service';
@@ -39,5 +41,22 @@ export class DialogService extends BaseService {
                                     this.log.error('Error displaying MessageBoxComponent', err);
                                     throw err;
                                    }));
+  }
+
+  public showSaveDialog(content: string, defaultFilename: string, isJson: boolean): void {
+    const filters: FileFilter[] = [
+      { name: 'All Files', extensions: ['*'] }
+    ];
+    const options: SaveDialogSyncOptions = {
+      defaultPath: defaultFilename,
+      filters,
+      properties: ['createDirectory', 'showOverwriteConfirmation']
+    };
+
+    if (isJson) {
+      filters.unshift({ name: 'JSON', extensions: ['json'] });
+    }
+
+    this._electronService.emitRendererEvent(RendererEvent.ShowSaveDialog, content, options);
   }
 }

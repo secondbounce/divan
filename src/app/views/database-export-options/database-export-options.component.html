@@ -1,0 +1,24 @@
+<div class="background"></div>
+<form [formGroup]="this.formGroup" aria-label="Options" role="document" (ngSubmit)="onSubmit()">
+	<div class="field">
+		<input type="checkbox" id="includeDocs" formControlName="includeDocs">
+		<label for="includeDocs">Include (non-design) documents?</label>
+	</div>
+	<div class="field">
+		<input type="checkbox" id="includeRevs" formControlName="includeRevs">
+		<label for="includeRevs">Include document revisions?</label>
+	</div>
+	<label class="form-fullwidth">Export as:</label>
+	<div class="field">
+		<input type="radio" id="exportAsJson" formControlName="exportAs" [value]="true">
+		<label for="exportAsJson">JSON</label>
+	</div>
+	<div class="field">
+		<input type="radio" id="exportAsObject" formControlName="exportAs" [value]="false">
+		<label for="exportAsObject">Object</label>
+	</div>
+	<footer class="form-actions">
+		<button type="submit">OK</button>
+		<button type="button" (click)="onClickCancel()">Cancel</button>
+	</footer>
+</form>

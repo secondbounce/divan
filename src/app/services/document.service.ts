@@ -25,6 +25,29 @@ export class DocumentService extends BaseService {
     return this._couchDbService.get<Document>(url, headers);
   }
 
+  public getAllDocuments(database: DatabaseCredentials): Observable<Document[]> {
+    return this.getDocuments$(database, true)
+               .pipe(map((allDocs: AllDocuments) => {
+                      const docs: Document[] = [];
+                      allDocs.rows.map(docHeader => {
+                                    if (docHeader.doc) {
+                                      docs.push(docHeader.doc);
+                                    }
+                                  });
+                      return docs;
+                    }));
+  }
+
+  private getDocuments$(database: DatabaseCredentials, includeDocs: boolean): Observable<AllDocuments> {
+    const [url, headers ] = this.getUrlAndHeaders(database.serverCredentials,
+                                                  `/${database.name}/_all_docs`);
+
+    return this._couchDbService.get<AllDocuments>(url, headers,
+                                                  {
+                                                    include_docs: includeDocs
+                                                  });
+  }
+
   public getDesignDocuments(database: DatabaseCredentials): Observable<DesignDocument[]> {
     return this.getDesignDocuments$(database, true)
                .pipe(map((allDocs: AllDocuments) => {

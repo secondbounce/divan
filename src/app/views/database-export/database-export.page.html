@@ -1,0 +1,6 @@
+<header class="toolbar">
+	<button title="Save to file" class="icon-button" (click)="saveToFile()"><svg-icon src="assets/icons/save.svg"></svg-icon></button>
+	<button title="Reload" class="icon-button" (click)="run()"><svg-icon src="assets/icons/refresh.svg"></svg-icon></button>
+	<button title="Options" class="icon-button" (click)="this.showOptions()"><svg-icon src="assets/icons/options.svg"></svg-icon></button>
+</header>
+<article [innerHtml]="this.dbContent"></article>

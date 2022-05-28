@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 
 import { convertToText } from '~shared/string';
 import { environment } from '../environments/environment';
-import { DbDiffOptions, Logger, Server, ServerCredentials } from './core/model';
+import { DbDiffOptions, DbExportOptions, Logger, Server, ServerCredentials } from './core/model';
 import { Channel, MenuCommand, RendererEvent } from './enums';
 import { ElectronService, LogService, ModalService, TabManagerService, ToastService } from './services';
 import { ModalResult } from './ui-components';
 import { DatabaseDiffOptionsComponent } from './views/database-diff-options/database-diff-options.module';
 import { DatabaseDiffPage } from './views/database-diff/database-diff.module';
+import { DatabaseExportPage } from './views/database-export/database-export.module';
 import { SelectServerComponent } from './views/select-server/select-server.module';
 import { ServerListComponent } from './views/server-list/server-list.module';
 
@@ -44,6 +45,11 @@ export class AppComponent {
       case MenuCommand.DiffDatabases: {
         const [, serverAlias, database] = args;
         this.diffDatabases(serverAlias, database);
+        break;
+      }
+      case MenuCommand.ExportDatabase: {
+        const [, serverAlias, database] = args;
+        this.exportDatabase(serverAlias, database);
         break;
       }
       default:
@@ -99,5 +105,17 @@ export class AppComponent {
                           this._toastService.showError('Unable to display Database Diff options dialog.\n\n(See logs for error details.)');
                         }
                       });
+  }
+
+  private exportDatabase(serverAlias: string, database: string): void {
+    const options: DbExportOptions = {
+      serverAlias,
+      dbName: database,
+      includeDocs: false,
+      includeRevs: false,
+      exportAsJson: true
+    };
+
+    this._tabManagerService.open(DatabaseExportPage, options);
   }
 }

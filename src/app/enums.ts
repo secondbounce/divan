@@ -17,7 +17,8 @@ export const enum CompareResult {
 
 export const enum MenuCommand {
   OpenServer = 'open-server',
-  DiffDatabases = 'diff-databases'
+  DiffDatabases = 'diff-databases',
+  ExportDatabase = 'export-database'
 }
 
 export const enum MenuId {
@@ -28,14 +29,16 @@ export const enum MenuId {
     FileExit = 'file_exit',
   Edit = 'edit',
   Application = 'application',
-  DatabaseDiff = 'database_diff'
+  DatabaseDiff = 'database_diff',
+  ExportDatabase = 'export_database'
 }
 
 export const enum RendererEvent {
   ModalClosed = 'modal-closed',
   ModalOpened = 'modal-opened',
   ServerOpened = 'server-opened',
-  ShowDatabaseContextMenu = 'show-database-context-menu'
+  ShowDatabaseContextMenu = 'show-database-context-menu',
+  ShowSaveDialog = 'show-save-dialog'
 }
 
 export const enum ResultStatus {
