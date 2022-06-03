@@ -1,4 +1,4 @@
-import { Injectable, Type } from '@angular/core';
+import { Injectable, NgZone, Type } from '@angular/core';
 import { Observable, ReplaySubject, takeUntil } from 'rxjs';
 
 import { ARRAY_LAST_ITEM_INDEX } from '../constants';
@@ -18,7 +18,8 @@ export class TabManagerService extends BaseService {
   private _tabItems: Map<string, TabItem> = new Map<string, TabItem>();
   private _tabItemOrder: string[] = [];
 
-  constructor(logService: LogService) {
+  constructor(private _ngZone: NgZone,
+              logService: LogService) {
     super(logService);
 
     this.updateTabItemValues();
@@ -47,18 +48,20 @@ export class TabManagerService extends BaseService {
     /* Need to add to map first since title change handler relies on it being available */
     this._tabItems.set(tabPanel.key, { key: tabPanel.key, title: '', fullTitle: '', active: true});
 
-    if (this._openTabHandler) {
-      this._openTabHandler(tabPanel).pipe(takeUntil(this.isBeingDestroyed$))
-                                    .subscribe(titles => {
-                                      const tabItem: TabItem | undefined = this._tabItems.get(key);
+    this._ngZone.run(() => {
+      if (this._openTabHandler) {
+        this._openTabHandler(tabPanel).pipe(takeUntil(this.isBeingDestroyed$))
+                                      .subscribe(titles => {
+                                        const tabItem: TabItem | undefined = this._tabItems.get(key);
 
-                                      if (tabItem) {
-                                        tabItem.title = titles[0];
-                                        tabItem.fullTitle = titles[1];
-                                        this.updateTabItemValues();
-                                      }
-                                    });
-    }
+                                        if (tabItem) {
+                                          tabItem.title = titles[0];
+                                          tabItem.fullTitle = titles[1];
+                                          this.updateTabItemValues();
+                                        }
+                                      });
+      }
+    });
 
     const activeKey: string = this._tabItemOrder.at(ARRAY_LAST_ITEM_INDEX) ?? '';
     const activeTabItem: TabItem | undefined = this._tabItems.get(activeKey);
