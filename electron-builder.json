@@ -1,6 +1,6 @@
 {
   "appId": "com.secondbounce.divan",
-  "asar": false,
+  "asar": true,
   "directories": {
     "output": "release/"
   },
@@ -9,15 +9,10 @@
     "!**/*.{map,ts}",
     "!package.json",
     "!package-lock.json",
-    "!**/.unused{/*}"
-  ],
-  "extraResources": [
+    "!**/.unused{/*}",
     {
-      "from": "dist",
-      "to": "app",
-      "filter": [
-        "**/*"
-      ]
+      "from": "../dist",
+      "filter": ["**/*"]
     }
   ],
   "win": {

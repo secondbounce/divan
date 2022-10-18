@@ -216,7 +216,7 @@ export class Application {
         pathIndex = '../dist/index.html';      // Path when running electron in local folder
       }
 
-      const url: URL = new URL('file:///' + path.join(__dirname, pathIndex));
+      const url: URL = new URL(path.join('file:', __dirname, pathIndex));
       appUrl = url.toString();
     }
 
