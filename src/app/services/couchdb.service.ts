@@ -2,9 +2,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of } from 'rxjs';
 
-import { DesignDocQueryParams, DocInfo, DocResponse } from '../core/couchdb';
 import { BaseService } from './base.service';
 import { LogService } from './log.service';
+import { DesignDocQueryParams, DocInfo, DocResponse } from '../core/couchdb';
 
 @Injectable({
   providedIn: 'root'

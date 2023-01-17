@@ -3,13 +3,13 @@ import { Injectable } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { Database, DbInfo, DESIGN_DOC_ID_PREFIX, DesignDocument, Document, Security } from '../core/couchdb';
-import { DatabaseCredentials, ServerCredentials } from '../core/model';
-import { getAuthorizationHeader } from '../utility';
 import { BaseService } from './base.service';
 import { CouchDbService } from './couchdb.service';
 import { DocumentService } from './document.service';
 import { LogService } from './log.service';
+import { Database, DbInfo, DESIGN_DOC_ID_PREFIX, DesignDocument, Document, Security } from '../core/couchdb';
+import { DatabaseCredentials, ServerCredentials } from '../core/model';
+import { getAuthorizationHeader } from '../utility';
 
 const enum ExportQueriesIndex {
   /* eslint-disable @typescript-eslint/no-shadow */

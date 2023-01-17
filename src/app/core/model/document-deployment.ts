@@ -1,8 +1,8 @@
 import { HttpHeaders } from '@angular/common/http';
 
+import { DatabaseCredentials } from './database-credentials';
 import { getAuthorizationHeader } from '../../utility';
 import { DesignDocument } from '../couchdb';
-import { DatabaseCredentials } from './database-credentials';
 
 export class DocumentDeployment {
   public readonly headers: HttpHeaders;

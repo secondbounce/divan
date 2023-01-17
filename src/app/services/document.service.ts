@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { catchError, concatMap, map, Observable, of, zip } from 'rxjs';
 
+import { BaseService } from './base.service';
+import { CouchDbService } from './couchdb.service';
+import { LogService } from './log.service';
 import { AllDocuments, DesignDocument, DocResponse, Document, DocumentHeader } from '../core/couchdb';
 import { DatabaseCredentials, DocumentDeployment } from '../core/model';
 import { ResultStatus } from '../enums';
 import { getSha1HashValue } from '../utility';
-import { BaseService } from './base.service';
-import { CouchDbService } from './couchdb.service';
-import { LogService } from './log.service';
 
 // TODO: deployDesignDoc() will fail for partitioned views
 

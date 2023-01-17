@@ -1,11 +1,11 @@
 import { Injectable, NgZone, Type } from '@angular/core';
 import { Observable, ReplaySubject, takeUntil } from 'rxjs';
 
+import { BaseService } from './base.service';
+import { LogService } from './log.service';
 import { ARRAY_LAST_ITEM_INDEX } from '../constants';
 import { TabItem, TabPanel, TabPanelComponent } from '../tabs';
 import { removeFromArray } from '../utility';
-import { BaseService } from './base.service';
-import { LogService } from './log.service';
 
 @Injectable({
   providedIn: 'root'

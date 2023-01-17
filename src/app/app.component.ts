@@ -1,16 +1,16 @@
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 
 import { convertToText } from '~shared/string';
-import { environment } from '../environments/environment';
 import { DbDiffOptions, DbExportOptions, Logger, Server, ServerCredentials } from './core/model';
 import { Channel, MenuCommand, RendererEvent } from './enums';
 import { ElectronService, LogService, ModalService, TabManagerService, ToastService } from './services';
 import { ModalResult } from './ui-components';
-import { DatabaseDiffOptionsComponent } from './views/database-diff-options/database-diff-options.module';
 import { DatabaseDiffPage } from './views/database-diff/database-diff.module';
+import { DatabaseDiffOptionsComponent } from './views/database-diff-options/database-diff-options.module';
 import { DatabaseExportPage } from './views/database-export/database-export.module';
 import { SelectServerComponent } from './views/select-server/select-server.module';
 import { ServerListComponent } from './views/server-list/server-list.module';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',

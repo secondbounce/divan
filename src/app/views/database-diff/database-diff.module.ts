@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 
-import { DocumentDiffModule } from '../document.diff/document.diff.module';
 import { DatabaseDiffPage } from './database-diff.page';
+import { DocumentDiffModule } from '../document.diff/document.diff.module';
 
 export { DatabaseDiffPage } from './database-diff.page';
 

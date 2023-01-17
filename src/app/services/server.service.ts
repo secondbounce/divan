@@ -2,12 +2,12 @@ import { HttpHeaders } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
 import { map, Observable, ReplaySubject } from 'rxjs';
 
-import { ServerMetaInfo } from '../core/couchdb';
-import { Server, ServerCredentials } from '../core/model';
-import { getAuthorizationHeader } from '../utility';
 import { BaseService } from './base.service';
 import { CouchDbService } from './couchdb.service';
 import { LogService } from './log.service';
+import { ServerMetaInfo } from '../core/couchdb';
+import { Server, ServerCredentials } from '../core/model';
+import { getAuthorizationHeader } from '../utility';
 
 @Injectable({
   providedIn: 'root'

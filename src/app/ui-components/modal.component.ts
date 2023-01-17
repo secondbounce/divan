@@ -1,7 +1,7 @@
 import { Directive, EventEmitter, HostBinding, HostListener, Output } from '@angular/core';
 
-import { AriaRole } from '../enums';
 import { FormComponent } from './form.component';
+import { AriaRole } from '../enums';
 
 export interface ModalResult {
   ok: boolean,

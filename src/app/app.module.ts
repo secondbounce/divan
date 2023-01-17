@@ -22,10 +22,10 @@ import {
        } from './services';
 import { TabPanelsModule } from './tabs/tab-panels/tab-panels.module';
 import { TabstripModule } from './tabs/tabstrip/tabstrip.module';
-import { DatabaseDiffOptionsModule } from './views/database-diff-options/database-diff-options.module';
 import { DatabaseDiffModule } from './views/database-diff/database-diff.module';
-import { DatabaseExportOptionsModule } from './views/database-export-options/database-export-options.module';
+import { DatabaseDiffOptionsModule } from './views/database-diff-options/database-diff-options.module';
 import { DatabaseExportModule } from './views/database-export/database-export.module';
+import { DatabaseExportOptionsModule } from './views/database-export-options/database-export-options.module';
 import { MessageBoxModule } from './views/message-box/message-box.module';
 import { SelectServerModule } from './views/select-server/select-server.module';
 import { ServerListModule } from './views/server-list/server-list.module';

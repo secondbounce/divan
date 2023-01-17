@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RendererEvent } from 'src/app/enums';
 
+import { RendererEvent } from 'src/app/enums';
 import { Logger, Server } from '../../core/model';
 import { ElectronService, LogService, ServerService, ToastService } from '../../services';
 

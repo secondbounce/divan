@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { FileFilter, SaveDialogSyncOptions } from 'electron';
 import { catchError, map, Observable } from 'rxjs';
-import { RendererEvent } from '../enums';
 
-import { MessageBoxComponent, MessageBoxOptions } from '../views/message-box/message-box.module';
 import { BaseService } from './base.service';
 import { ElectronService } from './electron.service';
 import { LogService } from './log.service';
 import { ModalService } from './modal.service';
+import { RendererEvent } from '../enums';
+import { MessageBoxComponent, MessageBoxOptions } from '../views/message-box/message-box.module';
 
 @Injectable({
   providedIn: 'root'

@@ -1,10 +1,10 @@
 import { Component, ComponentRef, OnDestroy, ViewChild, ViewContainerRef, ViewEncapsulation, ViewRef } from '@angular/core';
 import { Observable } from 'rxjs';
 
+import { TabPanelsDirective } from './tab-panels.directive';
 import { TabManagerService } from '../../services';
 import { TabPanel } from '../tab-panel';
 import { TabPanelComponent } from '../tab-panel.component';
-import { TabPanelsDirective } from './tab-panels.directive';
 
 @Component({
   selector: 'app-tab-panels',

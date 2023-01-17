@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { NgElement, WithProperties } from '@angular/elements';
 import { finalize, first, fromEvent, map, Observable } from 'rxjs';
 
+import { ElectronService } from './electron.service';
 import { RendererEvent } from '../enums';
 import { ModalComponent, ModalResult } from '../ui-components';
-import { ElectronService } from './electron.service';
 
 @Injectable({
   providedIn: 'root'
