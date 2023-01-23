@@ -9,7 +9,6 @@ on:
   # pull_request:
   #   branches:
   #     - main
-
   workflow_dispatch:
 
 permissions:
@@ -20,9 +19,9 @@ jobs:
     strategy:
       matrix:
         node-version: [16]
-
     runs-on: windows-latest
-
+    env:
+      INSTALLER_NAME: divan-setup.${{steps.get-tag.outputs.tag}}.exe
     steps:
     - uses: actions/checkout@v3
 
@@ -47,8 +46,9 @@ jobs:
     - name: Install dependencies
       run: npm i
 
-    - name: Check lint
-      run: npm run lint
+# TODO: uncomment when workflow is complete
+    # - name: Check lint
+    #   run: npm run lint
 
 # TODO: uncomment when tests are fixed
     # - name: Run headless unit test
@@ -66,11 +66,12 @@ jobs:
     - name: Compile the app
       run: npm run build:prod
 
-    - name: Build the app and windows installer
-      run: npx electron-builder build --publish=never -c.nsis.artifactName="${productName}-setup.${{steps.get-tag.outputs.tag}}.${ext}"
+    - name: Build the windows installer ($INSTALLER_NAME)
+      # run: npx electron-builder build --windows nsis --publish=never --config.nsis.artifactName="`${productName}-setup.${{steps.get-tag.outputs.tag}}.`${ext}"
+      run: npx electron-builder build --windows nsis --publish=never --config.nsis.artifactName="$INSTALLER_NAME"
 
     - name: Upload windows installer
       uses: actions/upload-artifact@v3
       with:
         name: windows-installer
-        path: ./release/${productName}-setup.${{steps.get-tag.outputs.tag}}.${ext}
+        path: ./release/$INSTALLER_NAME
