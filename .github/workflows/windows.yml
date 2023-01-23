@@ -20,8 +20,6 @@ jobs:
       matrix:
         node-version: [16]
     runs-on: windows-latest
-    env:
-      INSTALLER_NAME: divan-setup.${{steps.get-tag.outputs.tag}}.exe
     steps:
     - uses: actions/checkout@v3
 
@@ -63,15 +61,18 @@ jobs:
       with:
         without_prefix_v: true
 
+    - name: Set the output filename
+      run: echo "INSTALLER_NAME=divan-setup.${{steps.get-tag.outputs.tag}}.exe" >> $GITHUB_ENV
+
     - name: Compile the app
       run: npm run build:prod
 
     - name: Build the windows installer ($INSTALLER_NAME)
       # run: npx electron-builder build --windows nsis --publish=never --config.nsis.artifactName="`${productName}-setup.${{steps.get-tag.outputs.tag}}.`${ext}"
-      run: npx electron-builder build --windows nsis --publish=never --config.nsis.artifactName="$INSTALLER_NAME"
+      run: npx electron-builder build --windows nsis --publish=never --config.nsis.artifactName="${{ env.INSTALLER_NAME }}"
 
     - name: Upload windows installer
       uses: actions/upload-artifact@v3
       with:
         name: windows-installer
-        path: ./release/$INSTALLER_NAME
+        path: ./release/${{ env.INSTALLER_NAME }}
