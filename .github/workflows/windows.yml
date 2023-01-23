@@ -59,15 +59,15 @@ jobs:
 
     - name: Get current tag
       id: get-tag
-      uses: dawidd6/action-get-tag@v1
+      uses: aaronbarnaby/action-get-tag@v1
       with:
-        strip_v: true
+        without_prefix_v: true
 
     - name: Compile the app
       run: npm run build:prod
 
-    - name: Build the app
-      run: electron-builder build --publish=never -c.nsis.artifactName="${productName}-setup.${{steps.get-tag.outputs.tag}}.${ext}"
+    - name: Build the app and windows installer
+      run: npx electron-builder build --publish=never -c.nsis.artifactName="${productName}-setup.${{steps.get-tag.outputs.tag}}.${ext}"
 
     - name: Upload windows installer
       uses: actions/upload-artifact@v3
