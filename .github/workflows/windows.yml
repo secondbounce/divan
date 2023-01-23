@@ -1,20 +1,17 @@
-# This is a basic workflow to help you get started with Actions
 name: 'Windows Build'
 
-# Controls when the action will run.
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches:
-      - github-workflows
-  pull_request:
-    branches:
-      - main
+    tags:
+      - "v*.*"
+  #   branches:
+  #     - github-workflows
+  # pull_request:
+  #   branches:
+  #     - main
 
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 permissions:
   contents: read
 
@@ -24,7 +21,6 @@ jobs:
       matrix:
         node-version: [16]
 
-    # The type of runner that the job will run on
     runs-on: windows-latest
 
     steps:
@@ -48,7 +44,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Install Dependencies
+    - name: Install dependencies
       run: npm i
 
     - name: Check lint
@@ -61,5 +57,20 @@ jobs:
     # - name: Run headless e2e test
     #   run: npm run e2e
 
+    - name: Get current tag
+      id: get-tag
+      uses: dawidd6/action-get-tag@v1
+      with:
+        strip_v: true
+
+    - name: Compile the app
+      run: npm run build:prod
+
     - name: Build the app
-      run: npm run electron:build
+      run: electron-builder build --publish=never -c.nsis.artifactName="${productName}-setup.${{steps.get-tag.outputs.tag}}.${ext}"
+
+    - name: Upload windows installer
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows-installer
+        path: ./release/${productName}-setup.${{steps.get-tag.outputs.tag}}.${ext}
