@@ -59,7 +59,7 @@ jobs:
 
     - name: Get current tag
       id: get-tag
-      uses: aaronbarnaby/get-tag@v1
+      uses: aaronbarnaby/get-tag@v1.0.0
       with:
         without_prefix_v: true
 
