@@ -9,35 +9,138 @@ on:
 permissions:
   contents: read
 
+env:
+  NODE_VERSION: 16
+
 jobs:
-  build:
-    strategy:
-      matrix:
-        node-version: [16]
-    runs-on: windows-latest
+  build-macos:
+    name: Build macOS binaries
+    runs-on: macos-latest
+    environment: production
+    timeout-minutes: 60
+
+    # env:
+    #   APPLEID: ${{secrets.APPLEID}}
+    #   APPLEIDPASS: ${{secrets.APPLEIDPASS}}
+    #   ASCPROVIDER: ${{secrets.ASCPROVIDER}}
+    #   CSC_LINK: ${{secrets.MACOS_CSC_LINK}}
+    #   CSC_KEY_PASSWORD: ${{secrets.MACOS_CSC_KEY_PASSWORD}}
+    #   USE_HARD_LINKS: false
+
     steps:
-    - uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-    - name: Cache node modules
-      uses: actions/cache@v3
-      env:
-        cache-name: cache-node-modules
-      with:
-        # npm cache files are stored in `~/.npm`
-        path: ~/.npm
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
+      - name: Set up node ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Get current tag
+        id: get-tag
+        uses: aaronbarnaby/get-tag@v1.0.0
+        with:
+          without_prefix_v: true
 
-    - name: Install dependencies
-      run: npm i
+      - name: Set the output filename
+          # echo "INSTALLER_NAME=divan-setup.${{ steps.get-tag.outputs.tag }}.exe" >> $GITHUB_ENV
+        run: |
+          echo "APP_VERSION=${{ steps.get-tag.outputs.tag }}" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: npm i
+
+# TODO: uncomment when workflow is complete
+      # - name: Check lint
+      #   run: npm run lint
+
+# TODO: uncomment when tests are fixed
+      # - name: Run headless unit test
+      #   run: npm run test
+
+      # - name: Run headless e2e test
+      #   run: npm run e2e
+
+      - name: Compile the app ${{ env.APP_VERSION }}
+        run: npm run build:prod
+
+      - name: TEMP - list files in dist folder
+        run: ls ./dist
+
+      - name: Upload app script files
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-script-files
+          path: ./dist/
+
+
+
+      # - name: Update NPM
+      #   run: |
+      #     npm install -g npm@latest
+
+      # - name: Get version from package.json
+      #   id: app-version
+      #   run: |
+      #     PACKAGE_VERSION=$(node -p -e "require('./packages/desktop/package.json').version")
+      #     echo "::set-output name=PACKAGE_VERSION::$PACKAGE_VERSION"
+
+      # - name: Build and package application
+      #   run: |
+      #     npm run bootstrap
+      #     npm run build:libs
+      #     npm run build:desktop:prod
+      #     npm run package:desktop:mac
+
+      # - name: Verify notarization
+      #   run: |
+      #     codesign --verify --deep --strict --verbose=2 ./packages/desktop/packages/mac/Mockoon.app
+      #     codesign --verify --deep --strict --verbose=2 ./packages/desktop/packages/mac-arm64/Mockoon.app
+      #     codesign --verify --deep --strict --verbose=2 ./packages/desktop/packages/mac-universal/Mockoon.app
+
+      # - name: Get universal binary shasum
+      #   run: |
+      #     shasum -a 256 ./packages/desktop/packages/mockoon.setup.${{steps.app-version.outputs.PACKAGE_VERSION}}.universal.dmg
+
+      # - name: Upload macOS dmg
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: dmg
+      #     path: ./packages/desktop/packages/mockoon.setup*.dmg
+
+
+
+
+
+
+  # build:
+  #   strategy:
+  #     matrix:
+  #       node-version: [16]
+  #   runs-on: windows-latest
+  #   steps:
+  #   - uses: actions/checkout@v3
+
+    # - name: Cache node modules
+    #   uses: actions/cache@v3
+    #   env:
+    #     cache-name: cache-node-modules
+    #   with:
+    #     # npm cache files are stored in `~/.npm`
+    #     path: ~/.npm
+    #     key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+    #     restore-keys: |
+    #       ${{ runner.os }}-build-${{ env.cache-name }}-
+    #       ${{ runner.os }}-build-
+    #       ${{ runner.os }}-
+
+    # - name: Use Node.js ${{ matrix.node-version }}
+    #   uses: actions/setup-node@v3
+    #   with:
+    #     node-version: ${{ matrix.node-version }}
+
+    # - name: Install dependencies
+    #   run: npm i
 
 # TODO: uncomment when workflow is complete
     # - name: Check lint
@@ -50,26 +153,40 @@ jobs:
     # - name: Run headless e2e test
     #   run: npm run e2e
 
-    - name: Get current tag
-      id: get-tag
-      uses: aaronbarnaby/get-tag@v1.0.0
-      with:
-        without_prefix_v: true
+    # - name: Get current tag
+    #   id: get-tag
+    #   uses: aaronbarnaby/get-tag@v1.0.0
+    #   with:
+    #     without_prefix_v: true
 
-    - name: Set the output filename
-      run: echo "INSTALLER_NAME=divan-setup.${{steps.get-tag.outputs.tag}}.exe" >> $GITHUB_ENV
+    # - name: Set the output filename
+    #   run: echo "INSTALLER_NAME=divan-setup.${{steps.get-tag.outputs.tag}}.exe" >> $GITHUB_ENV
 
-    - name: Compile the app
-      run: npm run build:prod
+    # - name: Compile the app
+    #   run: npm run build:prod
 
-    - name: Build the windows installer (${{ env.INSTALLER_NAME }})
-      run: npx electron-builder build --windows nsis --publish=never --config.nsis.artifactName="${{ env.INSTALLER_NAME }}"
+    # - name: Build the windows installer (${{ env.INSTALLER_NAME }})
+    #   run: npx electron-builder build --windows nsis --publish=never --config.nsis.artifactName="${{ env.INSTALLER_NAME }}"
 
-    - name: TEMP - list files in release folder
-      run: dir ./release
+    # - name: TEMP - list files in release folder
+    #   run: dir ./release
 
-    - name: Upload windows installer
-      uses: actions/upload-artifact@v3
-      with:
-        name: windows-installer
-        path: ./release/${{ env.INSTALLER_NAME }}
+    # - name: Upload windows installer
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: windows-installer
+    #     path: ./release/${{ env.INSTALLER_NAME }}
+
+    # - name: Create Github pre-release
+    #   if: (startsWith(github.ref, 'refs/tags/v') && contains(github.ref, '-')) || !startsWith(github.ref, 'refs/tags/v')
+    #   uses: softprops/action-gh-release@v1
+    #   with:
+    #     files: ./autolot.*.zip
+    #     prerelease: true
+
+    # - name: Create Github release
+    #   if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-')
+    #   uses: softprops/action-gh-release@v1
+    #   with:
+    #     files: ./autolot.*.zip
+    #     prerelease: false
