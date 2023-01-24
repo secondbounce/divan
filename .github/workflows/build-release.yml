@@ -16,7 +16,7 @@ jobs:
   build-macos:
     name: Build macOS binaries
     runs-on: macos-latest
-    environment: production
+    # environment: production
     timeout-minutes: 60
 
     # env:
@@ -43,9 +43,9 @@ jobs:
           without_prefix_v: true
 
       - name: Set the output filename
-          # echo "INSTALLER_NAME=divan-setup.${{ steps.get-tag.outputs.tag }}.exe" >> $GITHUB_ENV
         run: |
           echo "APP_VERSION=${{ steps.get-tag.outputs.tag }}" >> $GITHUB_ENV
+          echo "WINDOWS_INSTALLER_NAME=divan-setup.${{ steps.get-tag.outputs.tag }}.exe" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: npm i
@@ -64,14 +64,26 @@ jobs:
       - name: Compile the app ${{ env.APP_VERSION }}
         run: npm run build:prod
 
-      - name: TEMP - list files in dist folder
-        run: ls ./dist
+      # - name: TEMP - list files in dist folder
+      #   run: ls ./dist
 
-      - name: Upload app script files
-        uses: actions/upload-artifact@v3
-        with:
-          name: app-script-files
-          path: ./dist/
+      # - name: Upload app script files
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: app-script-files
+      #     path: |
+      #       ./dist/
+      #       ./app/
+      #       !./app/node_modules
+
+      - name: Build the windows installer (${{ env.WINDOWS_INSTALLER_NAME }})
+        run: npx electron-builder build --windows nsis --publish=never --config.nsis.artifactName="${{ env.WINDOWS_INSTALLER_NAME }}"
+
+      - name: TEMP - list files in release folder
+        run: ls ./release
+
+
+
 
       # - name: Get version from package.json
       #   id: app-version
@@ -99,14 +111,14 @@ jobs:
 
 
 
-  build-windows:
-    name: Build Windows binaries
-    runs-on: windows-latest
-    needs: build-macos
+  # build-windows:
+  #   name: Build Windows binaries
+  #   runs-on: windows-latest
+  #   needs: build-macos
 
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+  #   steps:
+  #     - name: Checkout repo
+  #       uses: actions/checkout@v3
 
     # - name: Cache node modules
     #   uses: actions/cache@v3
@@ -121,13 +133,13 @@ jobs:
     #       ${{ runner.os }}-build-
     #       ${{ runner.os }}-
 
-      - name: Set up node ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.NODE_VERSION }}
+      # - name: Set up node ${{ env.NODE_VERSION }}
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: ${{ env.NODE_VERSION }}
 
-      - name: Install dependencies
-        run: npm i
+      # - name: Install dependencies
+      #   run: npm i
 
 # TODO: uncomment when tests are fixed
       # - name: Run headless unit test
@@ -142,22 +154,22 @@ jobs:
       #   with:
       #     without_prefix_v: true
 
-      - name: Set the output filename for ${{ env.APP_VERSION }}
-        run: echo "INSTALLER_NAME=divan-setup.${{ env.APP_VERSION }}.exe" >> $GITHUB_ENV
+      # - name: Set the output filename for ${{ env.APP_VERSION }}
+      #   run: echo "INSTALLER_NAME=divan-setup.${{ env.APP_VERSION }}.exe" >> $GITHUB_ENV
 
       # - name: Compile the app
       #   run: npm run build:prod
 
-      - name: Download app script files from `build-macos` job
-        uses: actions/download-artifact@v3
-        with:
-          name: app-script-files
+      # - name: Download app script files from `build-macos` job
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: app-script-files
 
-      - name: Build the windows installer (${{ env.INSTALLER_NAME }})
-        run: npx electron-builder build --windows nsis --publish=never --config.nsis.artifactName="${{ env.INSTALLER_NAME }}"
+      # - name: Build the windows installer (${{ env.INSTALLER_NAME }})
+      #   run: npx electron-builder build --windows nsis --publish=never --config.nsis.artifactName="${{ env.INSTALLER_NAME }}"
 
-      - name: TEMP - list files in release folder
-        run: dir ./release
+      # - name: TEMP - list files in release folder
+      #   run: dir ./release
 
       # - name: Upload windows installer
       #   uses: actions/upload-artifact@v3
