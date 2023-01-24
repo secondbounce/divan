@@ -31,6 +31,19 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      # - name: Cache node modules
+      #   uses: actions/cache@v3
+      #   env:
+      #     cache-name: cache-node-modules
+      #   with:
+      #     # npm cache files are stored in `~/.npm`
+      #     path: ~/.npm
+      #     key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-build-${{ env.cache-name }}-
+      #       ${{ runner.os }}-build-
+      #       ${{ runner.os }}-
+
       - name: Set up node ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v3
         with:
@@ -76,11 +89,17 @@ jobs:
       #       ./app/
       #       !./app/node_modules
 
-      - name: Build the windows installer (${{ env.WINDOWS_INSTALLER_NAME }})
+      - name: Build windows installer
         run: npx electron-builder build --windows nsis --publish=never --config.nsis.artifactName="${{ env.WINDOWS_INSTALLER_NAME }}"
 
       - name: TEMP - list files in release folder
         run: ls ./release
+
+      - name: Upload windows installer (${{ env.WINDOWS_INSTALLER_NAME }})
+        uses: actions/upload-artifact@v3
+        with:
+          name: win-installer
+          path: ./release/${{ env.WINDOWS_INSTALLER_NAME }}
 
 
 
@@ -119,19 +138,6 @@ jobs:
   #   steps:
   #     - name: Checkout repo
   #       uses: actions/checkout@v3
-
-    # - name: Cache node modules
-    #   uses: actions/cache@v3
-    #   env:
-    #     cache-name: cache-node-modules
-    #   with:
-    #     # npm cache files are stored in `~/.npm`
-    #     path: ~/.npm
-    #     key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-    #     restore-keys: |
-    #       ${{ runner.os }}-build-${{ env.cache-name }}-
-    #       ${{ runner.os }}-build-
-    #       ${{ runner.os }}-
 
       # - name: Set up node ${{ env.NODE_VERSION }}
       #   uses: actions/setup-node@v3
