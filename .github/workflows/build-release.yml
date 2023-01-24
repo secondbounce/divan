@@ -1,4 +1,4 @@
-name: 'Windows Build'
+name: 'Build release files'
 
 on:
   push:
@@ -73,24 +73,11 @@ jobs:
           name: app-script-files
           path: ./dist/
 
-
-
-      # - name: Update NPM
-      #   run: |
-      #     npm install -g npm@latest
-
       # - name: Get version from package.json
       #   id: app-version
       #   run: |
       #     PACKAGE_VERSION=$(node -p -e "require('./packages/desktop/package.json').version")
       #     echo "::set-output name=PACKAGE_VERSION::$PACKAGE_VERSION"
-
-      # - name: Build and package application
-      #   run: |
-      #     npm run bootstrap
-      #     npm run build:libs
-      #     npm run build:desktop:prod
-      #     npm run package:desktop:mac
 
       # - name: Verify notarization
       #   run: |
@@ -112,14 +99,14 @@ jobs:
 
 
 
+  build-windows:
+    name: Build Windows binaries
+    runs-on: windows-latest
+    needs: build-macos
 
-  # build:
-  #   strategy:
-  #     matrix:
-  #       node-version: [16]
-  #   runs-on: windows-latest
-  #   steps:
-  #   - uses: actions/checkout@v3
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
     # - name: Cache node modules
     #   uses: actions/cache@v3
@@ -134,59 +121,60 @@ jobs:
     #       ${{ runner.os }}-build-
     #       ${{ runner.os }}-
 
-    # - name: Use Node.js ${{ matrix.node-version }}
-    #   uses: actions/setup-node@v3
-    #   with:
-    #     node-version: ${{ matrix.node-version }}
+      - name: Set up node ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
 
-    # - name: Install dependencies
-    #   run: npm i
-
-# TODO: uncomment when workflow is complete
-    # - name: Check lint
-    #   run: npm run lint
+      - name: Install dependencies
+        run: npm i
 
 # TODO: uncomment when tests are fixed
-    # - name: Run headless unit test
-    #   run: npm run test
+      # - name: Run headless unit test
+      #   run: npm run test
 
-    # - name: Run headless e2e test
-    #   run: npm run e2e
+      # - name: Run headless e2e test
+      #   run: npm run e2e
 
-    # - name: Get current tag
-    #   id: get-tag
-    #   uses: aaronbarnaby/get-tag@v1.0.0
-    #   with:
-    #     without_prefix_v: true
+      # - name: Get current tag
+      #   id: get-tag
+      #   uses: aaronbarnaby/get-tag@v1.0.0
+      #   with:
+      #     without_prefix_v: true
 
-    # - name: Set the output filename
-    #   run: echo "INSTALLER_NAME=divan-setup.${{steps.get-tag.outputs.tag}}.exe" >> $GITHUB_ENV
+      - name: Set the output filename for ${{ env.APP_VERSION }}
+        run: echo "INSTALLER_NAME=divan-setup.${{ env.APP_VERSION }}.exe" >> $GITHUB_ENV
 
-    # - name: Compile the app
-    #   run: npm run build:prod
+      # - name: Compile the app
+      #   run: npm run build:prod
 
-    # - name: Build the windows installer (${{ env.INSTALLER_NAME }})
-    #   run: npx electron-builder build --windows nsis --publish=never --config.nsis.artifactName="${{ env.INSTALLER_NAME }}"
+      - name: Download app script files from `build-macos` job
+        uses: actions/download-artifact@v3
+        with:
+          name: app-script-files
 
-    # - name: TEMP - list files in release folder
-    #   run: dir ./release
+      - name: Build the windows installer (${{ env.INSTALLER_NAME }})
+        run: npx electron-builder build --windows nsis --publish=never --config.nsis.artifactName="${{ env.INSTALLER_NAME }}"
 
-    # - name: Upload windows installer
-    #   uses: actions/upload-artifact@v3
-    #   with:
-    #     name: windows-installer
-    #     path: ./release/${{ env.INSTALLER_NAME }}
+      - name: TEMP - list files in release folder
+        run: dir ./release
 
-    # - name: Create Github pre-release
-    #   if: (startsWith(github.ref, 'refs/tags/v') && contains(github.ref, '-')) || !startsWith(github.ref, 'refs/tags/v')
-    #   uses: softprops/action-gh-release@v1
-    #   with:
-    #     files: ./autolot.*.zip
-    #     prerelease: true
+      # - name: Upload windows installer
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: windows-installer
+      #     path: ./release/${{ env.INSTALLER_NAME }}
 
-    # - name: Create Github release
-    #   if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-')
-    #   uses: softprops/action-gh-release@v1
-    #   with:
-    #     files: ./autolot.*.zip
-    #     prerelease: false
+      # - name: Create Github pre-release
+      #   if: (startsWith(github.ref, 'refs/tags/v') && contains(github.ref, '-')) || !startsWith(github.ref, 'refs/tags/v')
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     files: ./autolot.*.zip
+      #     prerelease: true
+
+      # - name: Create Github release
+      #   if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-')
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     files: ./autolot.*.zip
+      #     prerelease: false
