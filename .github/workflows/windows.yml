@@ -4,11 +4,6 @@ on:
   push:
     tags:
       - "v*.*"
-  #   branches:
-  #     - github-workflows
-  # pull_request:
-  #   branches:
-  #     - main
   workflow_dispatch:
 
 permissions:
@@ -67,9 +62,11 @@ jobs:
     - name: Compile the app
       run: npm run build:prod
 
-    - name: Build the windows installer ($INSTALLER_NAME)
-      # run: npx electron-builder build --windows nsis --publish=never --config.nsis.artifactName="`${productName}-setup.${{steps.get-tag.outputs.tag}}.`${ext}"
+    - name: Build the windows installer (${{ env.INSTALLER_NAME }})
       run: npx electron-builder build --windows nsis --publish=never --config.nsis.artifactName="${{ env.INSTALLER_NAME }}"
+
+    - name: TEMP - list files in release folder
+      run: dir ./release
 
     - name: Upload windows installer
       uses: actions/upload-artifact@v3
